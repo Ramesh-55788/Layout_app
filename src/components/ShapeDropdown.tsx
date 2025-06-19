@@ -17,76 +17,66 @@ function ShapeDropdown({ isOpen, onClose, onSelectShape, theme }: ShapeDropdownP
     { name: 'Hexagon', value: 'hexagon' as const },
   ];
 
+  const background = theme === 'dark' ? '#374151' : '#f3f4f6';
+  const strokeColor = theme === 'dark' ? '#9CA3AF' : '#374151';
+
   const renderShapePreview = (shape: Panel['shape']) => {
-    const background = theme === 'dark' ? '#374151' : '#f3f4f6';
-    const borderColor = 'black';
-
-    const wrapperStyle = {
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      width: '28px',
-      height: '28px',
-    };
-
-    const innerBase = {
-      width: '24px',
-      height: '24px',
-      backgroundColor: background,
-      border: `1px solid ${borderColor}`,
+    const commonProps = {
+      fill: background,
+      stroke: strokeColor,
+      strokeWidth: 1,
+      strokeLinejoin: 'round' as const,
     };
 
     switch (shape) {
       case 'rectangle':
-        return <div className="shadow-sm" style={{ ...innerBase, width: '32px' }} />;
+        return (
+          <svg width="28" height="20" viewBox="0 0 28 20">
+            <rect x="1" y="1" width="26" height="18" {...commonProps} />
+          </svg>
+        );
+      
       case 'square':
-        return <div className="shadow-sm" style={innerBase} />;
+        return (
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <rect x="1" y="1" width="22" height="22" {...commonProps} />
+          </svg>
+        );
+      
       case 'circle':
-        return <div className="shadow-sm" style={{ ...innerBase, borderRadius: '50%' }} />;
+        return (
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="11" {...commonProps} />
+          </svg>
+        );
+      
       case 'triangle':
         return (
-          <div className="shadow-sm" style={wrapperStyle}>
-            <svg width="24" height="20" viewBox="0 0 24 20">
-              <path
-                d="M12 2 L2 18 L22 18 Z"
-                fill={background}
-                stroke={borderColor}
-                strokeWidth="1"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <polygon points="12,2 22,20 2,20" {...commonProps} />
+          </svg>
         );
+      
       case 'diamond':
         return (
-          <div className="shadow-sm" style={wrapperStyle}>
-            <div
-              style={{
-                width: '16px',
-                height: '16px',
-                backgroundColor: background,
-                border: `1px solid ${borderColor}`,
-                transform: 'rotate(45deg)',
-              }}
-            />
-          </div>
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <polygon points="12,2 22,12 12,22 2,12" {...commonProps} />
+          </svg>
         );
+      
       case 'hexagon':
         return (
-          <div className="shadow-sm" style={wrapperStyle}>
-            <svg width="24" height="24" viewBox="0 0 24 24">
-              <polygon
-                points="6,2 18,2 23,12 18,22 6,22 1,12"
-                fill={background}
-                stroke={borderColor}
-                strokeWidth="1"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </div>
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <polygon points="12,2 20,7 20,17 12,22 4,17 4,7" {...commonProps} />
+          </svg>
         );
+      
       default:
-        return <div className="shadow-sm" style={innerBase} />;
+        return (
+          <svg width="24" height="24" viewBox="0 0 24 24">
+            <rect x="1" y="1" width="22" height="22" {...commonProps} />
+          </svg>
+        );
     }
   };
 
@@ -94,10 +84,11 @@ function ShapeDropdown({ isOpen, onClose, onSelectShape, theme }: ShapeDropdownP
 
   return (
     <div
-      className={`absolute top-12 left-0 z-50 rounded-lg shadow-2xl border-2 p-4 grid grid-cols-3 ${theme === 'dark'
-        ? 'bg-gray-800 border-gray-600 text-white'
-        : 'bg-white border-gray-300 text-gray-900'
-        }`}
+      className={`absolute top-12 left-0 z-50 rounded-lg shadow-2xl border-2 p-4 grid grid-cols-3 gap-2 ${
+        theme === 'dark'
+          ? 'bg-gray-800 border-gray-600 text-white'
+          : 'bg-white border-gray-300 text-gray-900'
+      }`}
       style={{ minWidth: '220px', maxWidth: '260px' }}
     >
       {shapes.map((shape) => (
@@ -107,11 +98,16 @@ function ShapeDropdown({ isOpen, onClose, onSelectShape, theme }: ShapeDropdownP
             onSelectShape(shape.value);
             onClose();
           }}
-          className={`w-full flex flex-col items-center justify-center pt-3 pb-2 rounded-md transition-colors hover:shadow-md ${theme === 'dark' ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-            }`}
+          className={`flex flex-col items-center justify-center p-3 rounded-md transition-all duration-200 hover:scale-105 ${
+            theme === 'dark' 
+              ? 'hover:bg-gray-700 hover:shadow-lg' 
+              : 'hover:bg-gray-100 hover:shadow-md'
+          }`}
         >
-          {renderShapePreview(shape.value)}
-          <span className="text-xs mt-1">{shape.name}</span>
+          <div className="mb-2">
+            {renderShapePreview(shape.value)}
+          </div>
+          <span className="text-xs font-medium">{shape.name}</span>
         </button>
       ))}
     </div>

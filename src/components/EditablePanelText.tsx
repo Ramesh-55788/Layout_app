@@ -21,7 +21,7 @@ function EditablePanelText({
   }, [panel.text]);
 
   const handleBlur = () => {
-    updatePanelText(panel.id, text);
+    updatePanelText(panel.id, text.trim());
     setEditingId(null);
   };
 
@@ -36,18 +36,22 @@ function EditablePanelText({
 
   return (
     <div
-      className="absolute top-1/2 left-1/2 px-2 text-center pointer-events-auto overflow-hidden"
+      className="absolute"
       style={{
+        top: '50%',
+        left: '50%',
         transform: 'translate(-50%, -50%)',
         fontSize,
-        width: panel.width - 12,
-        maxHeight: panel.height - 12,
+        width: `${panel.width * 0.9}px`,
+        maxHeight: `${panel.height * 0.9}px`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        pointerEvents: 'auto',
+        overflow: 'hidden',
         textAlign: 'center',
-        overflowWrap: 'break-word',
         wordBreak: 'break-word',
+        lineHeight: 1.2,
       }}
       onDoubleClick={() => setEditingId(panel.id)}
     >
@@ -62,8 +66,18 @@ function EditablePanelText({
           style={{ fontSize }}
         />
       ) : (
-        <span className="text-gray-700 select-none w-full break-words overflow-hidden">
-          {panel.text !== undefined && panel.text !== null ? panel.text : 'Text'}
+        <span
+          className="text-gray-700 select-none w-full"
+          style={{
+            display: 'block',
+            width: '100%',
+            whiteSpace: 'pre-wrap',
+            wordWrap: 'break-word',
+            overflowWrap: 'break-word',
+            textAlign: 'center',
+          }}
+        >
+          {text.trim() || ''}
         </span>
       )}
     </div>
