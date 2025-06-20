@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { DimensionsPanelProps } from './types.ts';
+import { PanelPropertiesProps } from './types.ts';
 import FontStyleSelector from './FontStyleSelector.tsx';
 
-function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: DimensionsPanelProps) {
+function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPropertiesProps) {
   const [editWidth, setEditWidth] = useState('');
   const [editHeight, setEditHeight] = useState('');
   const [bgColor, setBgColor] = useState('#ffffff');
@@ -38,13 +38,13 @@ function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: Dimensio
   const handleColorChange = (color: string, type: 'background' | 'border') => {
     if (type === 'background') {
       setBgColor(color);
-      onUpdateDimensions(parseInt(editWidth), parseInt(editHeight), color, borderColor, text, parseInt(borderWidth), textColor, fontSize,
+      onUpdateProperties(parseInt(editWidth), parseInt(editHeight), color, borderColor, text, parseInt(borderWidth), textColor, fontSize,
         fontWeight,
         fontStyle,
         textDecoration);
     } else {
       setBorderColor(color);
-      onUpdateDimensions(parseInt(editWidth), parseInt(editHeight), bgColor, color, text, parseInt(borderWidth), textColor, fontSize,
+      onUpdateProperties(parseInt(editWidth), parseInt(editHeight), bgColor, color, text, parseInt(borderWidth), textColor, fontSize,
         fontWeight,
         fontStyle,
         textDecoration);
@@ -64,7 +64,7 @@ function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: Dimensio
     setBorderWidth(borderW.toString());
     setFontSize(clampedFontSize);
 
-    onUpdateDimensions(width, height, bgColor, borderColor, text, borderW, textColor, clampedFontSize,
+    onUpdateProperties(width, height, bgColor, borderColor, text, borderW, textColor, clampedFontSize,
       fontWeight,
       fontStyle,
       textDecoration);
@@ -76,7 +76,7 @@ function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: Dimensio
     const borderW = Math.max(0, Math.min(100, parseInt(borderWidth) || 1));
     const clampedFontSize = Math.max(8, Math.min(100, fontSize));
 
-    onUpdateDimensions(
+    onUpdateProperties(
       width,
       height,
       bgColor,
@@ -208,7 +208,7 @@ function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: Dimensio
                   onChange={(e) => {
                     const newColor = e.target.value;
                     setTextColor(newColor);
-                    onUpdateDimensions(
+                    onUpdateProperties(
                       parseInt(editWidth),
                       parseInt(editHeight),
                       bgColor,
@@ -240,7 +240,7 @@ function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: Dimensio
                   setFontStyle(italic);
                   setTextDecoration(underline);
                   handleUpdate();
-                  onUpdateDimensions(
+                  onUpdateProperties(
                     parseInt(editWidth),
                     parseInt(editHeight),
                     bgColor,
@@ -329,4 +329,4 @@ function DimensionsPanel({ panel, theme, onUpdateDimensions, onClose }: Dimensio
   );
 }
 
-export default DimensionsPanel;
+export default PanelProperties;

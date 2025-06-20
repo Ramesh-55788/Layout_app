@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import { Moon, Sun, Plus, Trash2, Settings, Download, Upload, Save } from 'lucide-react';
 import { Panel } from './types';
-import DimensionsPanel from './DimensionsPanel';
+import PanelProperties from './PanelProperties';
 import ShapeDropdown from './ShapeDropdown';
 import UndoRedo from './UndoRedo';
 import DraggablePanel from './DraggablePanel';
@@ -53,7 +53,7 @@ export default function DrawingCanvas() {
     panels, setPanels, selectedPanel, canvasWidth, canvasHeight, saveToHistory
   );
 
-  const { updatePanelText, updateSelectedPanelDimensions, addPanel, removePanel, clearPanels, handleDragStop } = usePanelOperations(
+  const { updatePanelText, updateSelectedPanelProperties, addPanel, removePanel, clearPanels, handleDragStop } = usePanelOperations(
     panels, setPanels, setSelectedPanel, saveToHistory
   );
 
@@ -100,12 +100,12 @@ export default function DrawingCanvas() {
             : 'linear-gradient(221deg,rgba(238, 174, 199, 1) 17%, rgba(148, 165, 233, 1) 100%)',
       }}
     >
-      <DimensionsPanel
+      <PanelProperties
         panel={selectedPanelData || null}
         theme={theme}
-        onUpdateDimensions={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+        onUpdateProperties={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
           fontWeight, fontStyle, textDecoration, zAction) =>
-          updateSelectedPanelDimensions(selectedPanel, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+            updateSelectedPanelProperties(selectedPanel, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
             fontWeight, fontStyle, textDecoration, zAction)
         }
         onClose={clearSelection}

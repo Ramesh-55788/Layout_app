@@ -35,7 +35,7 @@ export const usePanelOperations = (
     );
   };
 
-  const updateSelectedPanelDimensions = (
+  const updateSelectedPanelProperties = (
     selectedPanel: string | null,
     width: number,
     height: number,
@@ -145,7 +145,7 @@ export const usePanelOperations = (
 
   return {
     updatePanelText,
-    updateSelectedPanelDimensions,
+    updateSelectedPanelProperties,
     addPanel,
     removePanel,
     clearPanels,

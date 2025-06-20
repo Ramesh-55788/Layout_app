@@ -17,10 +17,10 @@ export interface Panel {
   textDecoration?: 'none' | 'underline';
 }
 
-export interface DimensionsPanelProps {
+export interface PanelPropertiesProps {
   panel: Panel | null;
   theme: string;
-  onUpdateDimensions: (
+  onUpdateProperties: (
     width: number,
     height: number,
     bgColor: string,
