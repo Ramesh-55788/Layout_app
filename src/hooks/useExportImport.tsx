@@ -1,5 +1,5 @@
 import html2canvas from 'html2canvas';
-import { Panel } from './types';
+import { Panel } from '../components/types';
 
 interface CanvasConfig {
     panels: Panel[];

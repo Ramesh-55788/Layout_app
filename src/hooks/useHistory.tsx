@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Panel } from './types';
+import { Panel } from '../components/types';
 
 interface HistoryState {
   panels: Panel[];
@@ -12,19 +12,19 @@ interface HistoryState {
 }
 
 export const useHistory = (
-  panels: Panel[], 
+  panels: Panel[],
   setPanels: React.Dispatch<React.SetStateAction<Panel[]>>,
-  canvasWidth: number, 
+  canvasWidth: number,
   setCanvasWidth: React.Dispatch<React.SetStateAction<number>>,
-  canvasHeight: number, 
+  canvasHeight: number,
   setCanvasHeight: React.Dispatch<React.SetStateAction<number>>,
-  canvasBgColor: string, 
+  canvasBgColor: string,
   setCanvasBgColor: React.Dispatch<React.SetStateAction<string>>,
-  canvasFgColor: string, 
+  canvasFgColor: string,
   setCanvasFgColor: React.Dispatch<React.SetStateAction<string>>,
-  roundedCorners: boolean, 
+  roundedCorners: boolean,
   setRoundedCorners: React.Dispatch<React.SetStateAction<boolean>>,
-  showGrid: boolean, 
+  showGrid: boolean,
   setShowGrid: React.Dispatch<React.SetStateAction<boolean>>,
   setSelectedPanel: React.Dispatch<React.SetStateAction<string | null>>
 ) => {
@@ -33,7 +33,7 @@ export const useHistory = (
 
   const saveToHistory = useCallback(() => {
     const currentState: HistoryState = {
-      panels,
+      panels: JSON.parse(JSON.stringify(panels)),
       canvasWidth,
       canvasHeight,
       canvasBgColor,
@@ -45,25 +45,32 @@ export const useHistory = (
     setHistory(prev => {
       const newHistory = prev.slice(0, historyIndex + 1);
       newHistory.push(currentState);
-      if (newHistory.length > 50) {
-        newHistory.shift();
-        return newHistory;
-      }
-      return newHistory;
+      const trimmedHistory =
+        newHistory.length > 50 ? newHistory.slice(1) : newHistory;
+      setHistoryIndex(trimmedHistory.length - 1);
+      return trimmedHistory;
     });
-    setHistoryIndex(prev => Math.min(prev + 1, 49));
-  }, [panels, canvasWidth, canvasHeight, canvasBgColor, canvasFgColor, roundedCorners, showGrid, historyIndex]);
+  }, [
+    panels,
+    canvasWidth,
+    canvasHeight,
+    canvasBgColor,
+    canvasFgColor,
+    roundedCorners,
+    showGrid,
+    historyIndex
+  ]);
 
   useEffect(() => {
     if (history.length === 0) {
       saveToHistory();
     }
-  }, []);
+  }, [saveToHistory, history.length]);
 
   const undo = useCallback(() => {
     if (historyIndex > 0) {
       const prevState = history[historyIndex - 1];
-      setPanels(prevState.panels);
+      setPanels(JSON.parse(JSON.stringify(prevState.panels)));
       setCanvasWidth(prevState.canvasWidth);
       setCanvasHeight(prevState.canvasHeight);
       setCanvasBgColor(prevState.canvasBgColor);
@@ -78,7 +85,7 @@ export const useHistory = (
   const redo = useCallback(() => {
     if (historyIndex < history.length - 1) {
       const nextState = history[historyIndex + 1];
-      setPanels(nextState.panels);
+      setPanels(JSON.parse(JSON.stringify(nextState.panels)));
       setCanvasWidth(nextState.canvasWidth);
       setCanvasHeight(nextState.canvasHeight);
       setCanvasBgColor(nextState.canvasBgColor);

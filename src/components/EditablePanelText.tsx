@@ -33,6 +33,22 @@ function EditablePanelText({
   };
 
   const fontSize = Math.max(12, Math.min(panel.width, panel.height) / 10);
+  const textColor = panel.textColor || '#000000';
+
+  const shapeBoundRatio = {
+    rectangle: 0.9,
+    square: 0.9,
+    circle: 0.75,
+    triangle: 0.4,
+    diamond: 0.5,
+    hexagon: 0.7,
+  };
+
+  const widthRatio = shapeBoundRatio[panel.shape] || 0.7;
+  const heightRatio = shapeBoundRatio[panel.shape] || 0.7;
+
+  const maxTextWidth = panel.width * widthRatio;
+  const maxLines = Math.floor((panel.height * heightRatio) / ((panel.fontSize || 16) * 1.2));
 
   return (
     <div
@@ -42,8 +58,9 @@ function EditablePanelText({
         left: '50%',
         transform: 'translate(-50%, -50%)',
         fontSize,
-        width: `${panel.width * 0.9}px`,
-        maxHeight: `${panel.height * 0.9}px`,
+        color: textColor,
+        width: `${maxTextWidth}px`,
+        maxHeight: `${panel.height * heightRatio}px`,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -63,18 +80,30 @@ function EditablePanelText({
           onKeyDown={handleKeyDown}
           autoFocus
           className="bg-transparent text-center outline-none w-full h-full resize-none"
-          style={{ fontSize }}
+          style={{ fontSize, color: textColor }}
         />
       ) : (
         <span
-          className="text-gray-700 select-none w-full"
+          className="select-text cursor-text w-full"
           style={{
-            display: 'block',
             width: '100%',
-            whiteSpace: 'pre-wrap',
-            wordWrap: 'break-word',
+            height: '100%',
+            color: panel.textColor || '#000',
+            fontSize: panel.fontSize || 16,
+            fontWeight: panel.fontWeight || 'normal',
+            fontStyle: panel.fontStyle || 'normal',
+            textDecoration: panel.textDecoration || 'none',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'normal',
+            wordBreak: 'break-word',
             overflowWrap: 'break-word',
             textAlign: 'center',
+            userSelect: 'text',
+            lineHeight: 1.2,
+            display: '-webkit-box',
+            WebkitLineClamp: maxLines,
+            WebkitBoxOrient: 'vertical',
           }}
         >
           {text.trim() || ''}

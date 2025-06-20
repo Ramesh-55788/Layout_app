@@ -4,7 +4,10 @@ export const useKeyboardControls = (
   showShapeDropdown: boolean, 
   setShowShapeDropdown: (show: boolean) => void, 
   undo: () => void, 
-  redo: () => void
+  redo: () => void,
+  cut: () => void,
+  copy: () => void,
+  paste: () => void
 ) => {
   const [isCtrlPressed, setIsCtrlPressed] = useState<boolean>(false);
 
@@ -20,6 +23,15 @@ export const useKeyboardControls = (
       } else if (e.ctrlKey && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
         e.preventDefault();
         redo();
+      } else if (e.ctrlKey && e.key === 'x') {
+        e.preventDefault();
+        cut();
+      } else if (e.ctrlKey && e.key === 'c') {
+        e.preventDefault();
+        copy();
+      } else if (e.ctrlKey && e.key === 'v') {
+        e.preventDefault();
+        paste();
       }
     };
 
@@ -44,7 +56,15 @@ export const useKeyboardControls = (
       window.removeEventListener('keyup', handleKeyUp);
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showShapeDropdown, setShowShapeDropdown, undo, redo]);
+  }, [
+    showShapeDropdown, 
+    setShowShapeDropdown, 
+    undo, 
+    redo,
+    cut,
+    copy,
+    paste
+  ]);
 
   return { isCtrlPressed };
 };

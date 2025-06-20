@@ -1,11 +1,32 @@
-import { Panel } from './types';
+import { Panel } from '../components/types';
+import { reorderPanelsByZIndex } from '../utils/zIndexUtils';
 
 export const usePanelOperations = (
-  panels: Panel[], 
-  setPanels: React.Dispatch<React.SetStateAction<Panel[]>>, 
-  setSelectedPanel: React.Dispatch<React.SetStateAction<string | null>>, 
+  panels: Panel[],
+  setPanels: React.Dispatch<React.SetStateAction<Panel[]>>,
+  setSelectedPanel: React.Dispatch<React.SetStateAction<string | null>>,
   saveToHistory: () => void
 ) => {
+  let saveHistoryTimeout: number | null = null;
+
+  const debouncedSaveToHistory = () => {
+    if (saveHistoryTimeout) {
+      clearTimeout(saveHistoryTimeout);
+    }
+    saveHistoryTimeout = setTimeout(() => {
+      saveToHistory();
+      saveHistoryTimeout = null;
+    }, 500);
+  };
+
+  const updatePanelProperties = (panels: Panel[], selectedPanel: string, properties: Partial<Panel>) => {
+    return panels.map(panel =>
+      panel.id === selectedPanel
+        ? { ...panel, ...properties }
+        : panel
+    );
+  };
+
   const updatePanelText = (id: string, newText: string) => {
     setPanels(prev =>
       prev.map(panel =>
@@ -20,18 +41,44 @@ export const usePanelOperations = (
     height: number,
     bgColor: string,
     borderColor: string,
-    text: string
+    text: string,
+    borderWidth: number,
+    textColor: string,
+    fontSize: number,
+    fontWeight: 'normal' | 'bold',
+    fontStyle: 'normal' | 'italic',
+    textDecoration: 'none' | 'underline',
+    zAction?: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward'
   ) => {
-    if (selectedPanel) {
-      setPanels(prev =>
-        prev.map(panel =>
-          panel.id === selectedPanel
-            ? { ...panel, width, height, bgColor, borderColor, text }
-            : panel
-        )
-      );
-      setTimeout(saveToHistory, 500);
-    }
+    if (!selectedPanel) return;
+
+    const properties = {
+      width,
+      height,
+      bgColor,
+      borderColor,
+      text,
+      borderWidth,
+      textColor,
+      fontSize,
+      fontWeight,
+      fontStyle,
+      textDecoration
+    };
+
+    setPanels(prevPanels => {
+      const currentIndex = prevPanels.findIndex(p => p.id === selectedPanel);
+      if (currentIndex === -1) return prevPanels;
+
+      if (!zAction || prevPanels.length <= 1) {
+        return updatePanelProperties(prevPanels, selectedPanel, properties);
+      }
+
+      const reordered = reorderPanelsByZIndex(prevPanels, selectedPanel, zAction);
+      return updatePanelProperties(reordered, selectedPanel, properties);
+    });
+
+    debouncedSaveToHistory();
   };
 
   const addPanel = (shape: Panel['shape']) => {
@@ -46,7 +93,7 @@ export const usePanelOperations = (
       let height = 200;
       switch (shape) {
         case 'rectangle':
-          width = 266; height = 200;
+          width = 266; height = 180;
           break;
         case 'diamond':
         case 'hexagon':
@@ -69,6 +116,7 @@ export const usePanelOperations = (
           zIndex: maxZIndex + 1,
           bgColor: '#ffffff',
           borderColor: '#D4D4D4',
+          borderWidth: 1,
           shape
         }
       ]);

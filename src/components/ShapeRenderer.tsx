@@ -14,9 +14,10 @@ function ShapeRenderer({
   setEditingId: (id: string | null) => void;
   updatePanelText: (id: string, text: string) => void;
 }) {
+
   const borderColor = panel.borderColor || '#000000';
   const bgColor = panel.bgColor || '#ffffff';
-  const borderWidth = 2;
+  const borderWidth = panel.borderWidth ?? 1;
 
   const textContainerStyle = {
     position: 'absolute' as const,
@@ -30,7 +31,9 @@ function ShapeRenderer({
     zIndex: 2,
     pointerEvents: 'auto' as const,
     padding: '4px',
-    overflow: 'hidden'
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap'
   };
 
   switch (panel.shape) {
@@ -40,10 +43,10 @@ function ShapeRenderer({
         <div style={{ position: 'relative', width: panel.width, height: panel.height }}>
           <svg width={panel.width} height={panel.height} style={{ position: 'absolute', top: 0, left: 0 }}>
             <rect
-              x={0}
-              y={0}
-              width={panel.width}
-              height={panel.height}
+              x={borderWidth / 2}
+              y={borderWidth / 2}
+              width={panel.width - borderWidth}
+              height={panel.height - borderWidth}
               fill={bgColor}
               stroke={borderColor}
               strokeWidth={borderWidth}
@@ -51,7 +54,7 @@ function ShapeRenderer({
               ry={roundedCorners ? 8 : 0}
             />
           </svg>
-          <div style={textContainerStyle}>
+          <div style={{ ...textContainerStyle, color: panel.textColor || '#000000' }}>
             <EditablePanelText
               panel={panel}
               isEditing={editingId === panel.id}
@@ -75,7 +78,7 @@ function ShapeRenderer({
               strokeWidth={borderWidth}
             />
           </svg>
-          <div style={textContainerStyle}>
+          <div style={{ ...textContainerStyle, color: panel.textColor || '#000000' }}>
             <EditablePanelText
               panel={panel}
               isEditing={editingId === panel.id}
@@ -91,14 +94,13 @@ function ShapeRenderer({
         <div style={{ position: 'relative', width: panel.width, height: panel.height }}>
           <svg width={panel.width} height={panel.height} style={{ position: 'absolute', top: 0, left: 0 }}>
             <polygon
-              points={`${panel.width / 2},${borderWidth} ${panel.width - borderWidth},${panel.height - borderWidth} ${borderWidth},${panel.height - borderWidth}`}
-              fill={bgColor}
+              points={`${panel.width / 2},${borderWidth / 2} ${panel.width - borderWidth / 2},${panel.height - borderWidth / 2} ${borderWidth / 2},${panel.height - borderWidth / 2}`} fill={bgColor}
               stroke={borderColor}
               strokeWidth={borderWidth}
               strokeLinejoin="round"
             />
           </svg>
-          <div style={textContainerStyle}>
+          <div style={{ ...textContainerStyle, color: panel.textColor || '#000000' }}>
             <EditablePanelText
               panel={panel}
               isEditing={editingId === panel.id}
@@ -114,14 +116,14 @@ function ShapeRenderer({
         <div style={{ position: 'relative', width: panel.width, height: panel.height }}>
           <svg width={panel.width} height={panel.height} style={{ position: 'absolute', top: 0, left: 0 }}>
             <polygon
-              points={`${panel.width / 2},${borderWidth} ${panel.width - borderWidth},${panel.height / 2} ${panel.width / 2},${panel.height - borderWidth} ${borderWidth},${panel.height / 2}`}
+              points={`${panel.width / 2},${borderWidth / 2} ${panel.width - borderWidth / 2},${panel.height / 2} ${panel.width / 2},${panel.height - borderWidth / 2} ${borderWidth / 2},${panel.height / 2}`}
               fill={bgColor}
               stroke={borderColor}
               strokeWidth={borderWidth}
               strokeLinejoin="round"
             />
           </svg>
-          <div style={textContainerStyle}>
+          <div style={{ ...textContainerStyle, color: panel.textColor || '#000000' }}>
             <EditablePanelText
               panel={panel}
               isEditing={editingId === panel.id}
@@ -133,13 +135,14 @@ function ShapeRenderer({
       );
 
     case 'hexagon':
+      const bw = borderWidth / 2;
       const hexPoints = [
-        [panel.width * 0.5, borderWidth],
-        [panel.width - borderWidth, panel.height * 0.25],
-        [panel.width - borderWidth, panel.height * 0.75],
-        [panel.width * 0.5, panel.height - borderWidth],
-        [borderWidth, panel.height * 0.75],
-        [borderWidth, panel.height * 0.25]
+        [panel.width * 0.5, bw],
+        [panel.width - bw, panel.height * 0.25],
+        [panel.width - bw, panel.height * 0.75],
+        [panel.width * 0.5, panel.height - bw],
+        [bw, panel.height * 0.75],
+        [bw, panel.height * 0.25]
       ];
 
       return (
@@ -153,7 +156,7 @@ function ShapeRenderer({
               strokeLinejoin="round"
             />
           </svg>
-          <div style={textContainerStyle}>
+          <div style={{ ...textContainerStyle, color: panel.textColor || '#000000' }}>
             <EditablePanelText
               panel={panel}
               isEditing={editingId === panel.id}
@@ -180,7 +183,7 @@ function ShapeRenderer({
               ry={roundedCorners ? 8 : 0}
             />
           </svg>
-          <div style={textContainerStyle}>
+          <div style={{ ...textContainerStyle, color: panel.textColor || '#000000' }}>
             <EditablePanelText
               panel={panel}
               isEditing={editingId === panel.id}

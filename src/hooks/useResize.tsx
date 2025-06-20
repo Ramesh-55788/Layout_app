@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Panel } from './types';
+import { Panel } from '../components/types';
 
 export const useResize = (
   panels: Panel[], 
@@ -77,7 +77,7 @@ export const useResize = (
         break;
     }
 
-    const minSize = 30;
+    const minSize = 50;
     newWidth = Math.max(minSize, newWidth);
     newHeight = Math.max(minSize, newHeight);
 

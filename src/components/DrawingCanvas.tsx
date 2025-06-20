@@ -6,12 +6,13 @@ import DimensionsPanel from './DimensionsPanel';
 import ShapeDropdown from './ShapeDropdown';
 import UndoRedo from './UndoRedo';
 import DraggablePanel from './DraggablePanel';
-import { useKeyboardControls } from './useKeyboardControls';
-import { useResize } from './useResize';
-import { useHistory } from './useHistory';
-import { usePanelOperations } from './usePanelOperations';
-import { useCanvasControls } from './useCanvasControls';
-import { useExportImport } from './useExportImport';
+import { useKeyboardControls } from '../hooks/useKeyboardControls';
+import { useResize } from '../hooks/useResize';
+import { useHistory } from '../hooks/useHistory';
+import { usePanelOperations } from '../hooks/usePanelOperations';
+import { useCanvasControls } from '../hooks/useCanvasControls';
+import { useExportImport } from '../hooks/useExportImport';
+import { useClipboard } from '../hooks/useClipboard';
 
 export default function DrawingCanvas() {
   const { theme, toggleTheme } = useTheme();
@@ -37,35 +38,27 @@ export default function DrawingCanvas() {
     canvasBgColor, setCanvasBgColor,
     canvasFgColor, setCanvasFgColor,
     roundedCorners, setRoundedCorners,
-    showGrid, setShowGrid,
-    setSelectedPanel
+    showGrid, setShowGrid, setSelectedPanel
   );
 
-  const { isCtrlPressed } = useKeyboardControls(showShapeDropdown, setShowShapeDropdown, undo, redo);
+  const { cut, copy, paste } = useClipboard(
+    panels, setPanels, selectedPanel, setSelectedPanel
+  );
+
+  const { isCtrlPressed } = useKeyboardControls(
+    showShapeDropdown, setShowShapeDropdown, undo, redo, cut, copy, paste
+  );
 
   const { isResizing, handleResizeStart } = useResize(
     panels, setPanels, selectedPanel, canvasWidth, canvasHeight, saveToHistory
   );
 
-  const {
-    updatePanelText,
-    updateSelectedPanelDimensions,
-    addPanel,
-    removePanel,
-    clearPanels,
-    handleDragStop
-  } = usePanelOperations(panels, setPanels, setSelectedPanel, saveToHistory);
+  const { updatePanelText, updateSelectedPanelDimensions, addPanel, removePanel, clearPanels, handleDragStop } = usePanelOperations(
+    panels, setPanels, setSelectedPanel, saveToHistory
+  );
 
-  const {
-    handleCanvasKeyDown,
-    handleCanvasColorChange,
-    handleToggleChange
-  } = useCanvasControls(
-    setCanvasWidth,
-    setCanvasHeight,
-    setCanvasBgColor,
-    setCanvasFgColor,
-    saveToHistory
+  const { handleCanvasKeyDown, handleCanvasColorChange, handleToggleChange } = useCanvasControls(
+    setCanvasWidth, setCanvasHeight, setCanvasBgColor, setCanvasFgColor, saveToHistory
   );
 
   const { exportToPNG, exportConfig, importConfig } = useExportImport(
@@ -110,8 +103,10 @@ export default function DrawingCanvas() {
       <DimensionsPanel
         panel={selectedPanelData || null}
         theme={theme}
-        onUpdateDimensions={(width, height, bgColor, borderColor, text) =>
-          updateSelectedPanelDimensions(selectedPanel, width, height, bgColor, borderColor, text)
+        onUpdateDimensions={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+          fontWeight, fontStyle, textDecoration, zAction) =>
+          updateSelectedPanelDimensions(selectedPanel, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+            fontWeight, fontStyle, textDecoration, zAction)
         }
         onClose={clearSelection}
       />
@@ -133,8 +128,8 @@ export default function DrawingCanvas() {
               <button
                 onClick={() => setShowShapeDropdown(!showShapeDropdown)}
                 className={`p-2 rounded-lg ${theme === 'dark'
-                    ? 'bg-green-600 hover:bg-green-700'
-                    : 'bg-green-500 hover:bg-green-600'
+                  ? 'bg-green-600 hover:bg-green-700'
+                  : 'bg-green-500 hover:bg-green-600'
                   } text-white transition-colors`}
               >
                 <div className="flex items-center gap-2">
@@ -152,16 +147,16 @@ export default function DrawingCanvas() {
             <button
               onClick={exportConfig}
               className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-blue-500 hover:bg-blue-600'
                 } text-white transition-colors`}
             >
               <Save size={20} />
             </button>
             <label
               className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-blue-600 hover:bg-blue-700'
+                : 'bg-blue-500 hover:bg-blue-600'
                 } text-white transition-colors cursor-pointer`}
             >
               <Upload size={20} />
@@ -175,8 +170,8 @@ export default function DrawingCanvas() {
             <button
               onClick={exportToPNG}
               className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-purple-600 hover:bg-purple-700'
-                  : 'bg-purple-500 hover:bg-purple-600'
+                ? 'bg-purple-600 hover:bg-purple-700'
+                : 'bg-purple-500 hover:bg-purple-600'
                 } text-white transition-colors`}
             >
               <Download size={20} />
@@ -184,8 +179,8 @@ export default function DrawingCanvas() {
             <button
               onClick={() => setIsEditingCanvas(!isEditingCanvas)}
               className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-gray-600 hover:bg-gray-700'
-                  : 'bg-gray-500 hover:bg-gray-600'
+                ? 'bg-gray-600 hover:bg-gray-700'
+                : 'bg-gray-500 hover:bg-gray-600'
                 } text-white transition-colors`}
             >
               <Settings size={20} />
@@ -193,8 +188,8 @@ export default function DrawingCanvas() {
             <button
               onClick={clearPanels}
               className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-red-600 hover:bg-red-700'
-                  : 'bg-red-500 hover:bg-red-600'
+                ? 'bg-red-600 hover:bg-red-700'
+                : 'bg-red-500 hover:bg-red-600'
                 } text-white transition-colors`}
             >
               <Trash2 size={20} />
@@ -202,8 +197,8 @@ export default function DrawingCanvas() {
             <button
               onClick={toggleTheme}
               className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-yellow-600 hover:bg-yellow-700'
-                  : 'bg-blue-500 hover:bg-blue-600'
+                ? 'bg-yellow-600 hover:bg-yellow-700'
+                : 'bg-blue-500 hover:bg-blue-600'
                 } text-white transition-colors`}
             >
               {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
@@ -240,8 +235,8 @@ export default function DrawingCanvas() {
                       onChange={(e) => setNewCanvasWidth(e.target.value)}
                       onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
                       className={`w-16 h-8 text-sm font-mono rounded px-2 ${theme === 'dark'
-                          ? 'bg-gray-600 text-white border-gray-500'
-                          : 'bg-white text-gray-900 border-gray-300'
+                        ? 'bg-gray-600 text-white border-gray-500'
+                        : 'bg-white text-gray-900 border-gray-300'
                         } border`}
                       min="200"
                       max="1200"
@@ -255,8 +250,8 @@ export default function DrawingCanvas() {
                       onChange={(e) => setNewCanvasHeight(e.target.value)}
                       onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
                       className={`w-16 h-8 text-sm font-mono rounded px-2 ${theme === 'dark'
-                          ? 'bg-gray-600 text-white border-gray-500'
-                          : 'bg-white text-gray-900 border-gray-300'
+                        ? 'bg-gray-600 text-white border-gray-500'
+                        : 'bg-white text-gray-900 border-gray-300'
                         } border`}
                       min="200"
                       max="1200"
@@ -291,12 +286,12 @@ export default function DrawingCanvas() {
                     <button
                       onClick={() => handleToggleChange(setRoundedCorners, roundedCorners)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${roundedCorners
-                          ? theme === 'dark'
-                            ? 'bg-blue-600'
-                            : 'bg-blue-500'
-                          : theme === 'dark'
-                            ? 'bg-gray-600'
-                            : 'bg-gray-300'
+                        ? theme === 'dark'
+                          ? 'bg-blue-600'
+                          : 'bg-blue-500'
+                        : theme === 'dark'
+                          ? 'bg-gray-600'
+                          : 'bg-gray-300'
                         }`}
                     >
                       <span
@@ -311,12 +306,12 @@ export default function DrawingCanvas() {
                     <button
                       onClick={() => handleToggleChange(setShowGrid, showGrid)}
                       className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${showGrid
-                          ? theme === 'dark'
-                            ? 'bg-blue-600'
-                            : 'bg-blue-500'
-                          : theme === 'dark'
-                            ? 'bg-gray-600'
-                            : 'bg-gray-300'
+                        ? theme === 'dark'
+                          ? 'bg-blue-600'
+                          : 'bg-blue-500'
+                        : theme === 'dark'
+                          ? 'bg-gray-600'
+                          : 'bg-gray-300'
                         }`}
                     >
                       <span
