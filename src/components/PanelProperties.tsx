@@ -93,9 +93,9 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
   };
 
   return (
-    <div className={`fixed top-28 right-3 z-50 p-5 rounded-md shadow-xl border w-[290px] font-sans ${theme === 'dark'
-      ? 'bg-[#2b2b2b] border-[#3f3f3f] text-white'
-      : 'bg-[#f3f3f3] border-[#d0d0d0] text-[#323130]'
+    <div className={`fixed top-28 right-3 z-50 p-4 rounded-xl shadow-xl border w-[300px] font-sans transition-all duration-300 ${theme === 'dark'
+        ? 'bg-[#2b2b2b] border-[#3f3f3f] text-white'
+        : 'bg-[#f3f3f3] border-[#d0d0d0] text-[#323130]'
       }`}>
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide">Properties</h3>
@@ -120,94 +120,128 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
 
         {isEditing && (
           <>
-            {panel.shape === 'circle' ? (
-              <div className="flex flex-col space-y-1">
-                <label className="text-xs">Radius</label>
-                <input
-                  type="number"
-                  value={editWidth}
-                  onChange={(e) => {
-                    setEditWidth(e.target.value);
-                    setEditHeight(e.target.value);
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                  className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                  min="50"
-                  max="720"
-                />
+            <details className="group rounded border transition-all" open>
+              <summary className="cursor-pointer text-xs font-semibold py-2 px-3 hover:bg-gray-200 dark:hover:bg-[#3a3a3a]">
+                Dimensions
+              </summary>
+              <div className="px-3 pb-3 pt-2 space-y-2">
+                {panel.shape === 'circle' ? (
+                  <div>
+                    <label className="text-xs">Radius</label>
+                    <input
+                      type="number"
+                      value={editWidth}
+                      onChange={(e) => {
+                        setEditWidth(e.target.value);
+                        setEditHeight(e.target.value);
+                      }}
+                      onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                      className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
+                      min="50"
+                      max="720"
+                    />
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <div className="flex-1">
+                      <label className="text-xs">Width</label>
+                      <input
+                        type="number"
+                        value={editWidth}
+                        onChange={(e) => setEditWidth(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                        className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
+                        min="50"
+                        max="1280"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <label className="text-xs">Height</label>
+                      <input
+                        type="number"
+                        value={editHeight}
+                        onChange={(e) => setEditHeight(e.target.value)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                        className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
+                        min="50"
+                        max="720"
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="flex gap-3 items-end">
-                <div className="flex-1">
-                  <label className="text-xs">Width</label>
+            </details>
+
+            <details className="group rounded border transition-all">
+              <summary className="cursor-pointer text-xs font-semibold py-2 px-3 hover:bg-gray-200 dark:hover:bg-[#3a3a3a]">
+                Text & Font
+              </summary>
+              <div className="px-3 pb-3 pt-2 space-y-2">
+                <div>
+                  <label className="text-xs">Text</label>
                   <input
-                    type="number"
-                    value={editWidth}
-                    onChange={(e) => setEditWidth(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                    type="text"
+                    value={text}
+                    onChange={(e) => setText(e.target.value)}
+                    onKeyDown={(e) => {
+                      e.stopPropagation();
+                      if (e.key === 'Enter') handleUpdate();
+                    }}
+                    onMouseDown={(e) => e.stopPropagation()}
                     className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                    min="50"
-                    max="1280"
+                    placeholder="Enter text"
                   />
                 </div>
-                <div className="text-lg font-bold text-gray-400">×</div>
-                <div className="flex-1">
-                  <label className="text-xs">Height</label>
+                <div>
+                  <label className="text-xs">Font Size</label>
                   <input
                     type="number"
-                    value={editHeight}
-                    onChange={(e) => setEditHeight(e.target.value)}
+                    value={fontSize}
+                    onChange={(e) => setFontSize(parseInt(e.target.value))}
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
                     className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                    min="50"
-                    max="720"
+                    min="0"
+                    max="100"
                   />
                 </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="text-xs">Text</label>
-                <input
-                  type="text"
-                  value={text}
-                  onChange={(e) => setText(e.target.value)}
-                  onKeyDown={(e) => {
-                    e.stopPropagation();
-                    if (e.key === 'Enter') handleUpdate();
-                  }}
-                  onMouseDown={(e) => e.stopPropagation()}
-                  className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                  placeholder="Enter text"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-xs">Font Size</label>
-                <input
-                  type="number"
-                  value={fontSize}
-                  onChange={(e) => {
-                    const newSize = parseInt(e.target.value);
-                    setFontSize(newSize);
-                  }}
-                  onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                  className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                  min="0"
-                  max="100"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="text-xs">Text Color</label>
-                <input
-                  type="color"
-                  value={textColor}
-                  onChange={(e) => {
-                    const newColor = e.target.value;
-                    setTextColor(newColor);
+                <div>
+                  <label className="text-xs">Text Color</label>
+                  <input
+                    type="color"
+                    value={textColor}
+                    onChange={(e) => {
+                      const newColor = e.target.value;
+                      setTextColor(newColor);
+                      onUpdateProperties(
+                        parseInt(editWidth),
+                        parseInt(editHeight),
+                        bgColor,
+                        borderColor,
+                        text,
+                        parseInt(borderWidth),
+                        newColor,
+                        fontSize,
+                        fontWeight,
+                        fontStyle,
+                        textDecoration
+                      );
+                    }}
+                    className="w-full h-8 border rounded cursor-pointer"
+                  />
+                </div>
+                <FontStyleSelector
+                  fontWeight={fontWeight}
+                  fontStyle={fontStyle}
+                  textDecoration={textDecoration}
+                  theme={theme}
+                  onChange={(styles: string[]) => {
+                    const weight = styles.includes('bold') ? 'bold' : 'normal';
+                    const italic = styles.includes('italic') ? 'italic' : 'normal';
+                    const underline = styles.includes('underline') ? 'underline' : 'none';
+                    setFontWeight(weight);
+                    setFontStyle(italic);
+                    setTextDecoration(underline);
+                    handleUpdate();
                     onUpdateProperties(
                       parseInt(editWidth),
                       parseInt(editHeight),
@@ -215,115 +249,88 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
                       borderColor,
                       text,
                       parseInt(borderWidth),
-                      newColor,
+                      textColor,
                       fontSize,
-                      fontWeight,
-                      fontStyle,
-                      textDecoration
+                      weight,
+                      italic,
+                      underline
                     );
                   }}
-                  className="w-full h-8 border rounded cursor-pointer"
                 />
               </div>
+            </details>
 
-              <FontStyleSelector
-                fontWeight={fontWeight}
-                fontStyle={fontStyle}
-                textDecoration={textDecoration}
-                theme={theme}
-                onChange={(styles: string[]) => {
-                  const weight = styles.includes('bold') ? 'bold' : 'normal';
-                  const italic = styles.includes('italic') ? 'italic' : 'normal';
-                  const underline = styles.includes('underline') ? 'underline' : 'none';
-
-                  setFontWeight(weight);
-                  setFontStyle(italic);
-                  setTextDecoration(underline);
-                  handleUpdate();
-                  onUpdateProperties(
-                    parseInt(editWidth),
-                    parseInt(editHeight),
-                    bgColor,
-                    borderColor,
-                    text,
-                    parseInt(borderWidth),
-                    textColor,
-                    fontSize,
-                    weight,
-                    italic,
-                    underline
-                  );
-                }}
-              />
-
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="flex-1">
-                <label className="text-xs">Background</label>
-                <input
-                  type="color"
-                  value={bgColor}
-                  onChange={(e) => handleColorChange(e.target.value, 'background')}
-                  className="w-full h-8 border rounded cursor-pointer"
-                />
+            <details className="group rounded border transition-all">
+              <summary className="cursor-pointer text-xs font-semibold py-2 px-3 hover:bg-gray-200 dark:hover:bg-[#3a3a3a]">
+                Background & Border
+              </summary>
+              <div className="px-3 pb-3 pt-2 space-y-2">
+                <div>
+                  <label className="text-xs">Background</label>
+                  <input
+                    type="color"
+                    value={bgColor}
+                    onChange={(e) => handleColorChange(e.target.value, 'background')}
+                    className="w-full h-8 border rounded cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs">Border Color</label>
+                  <input
+                    type="color"
+                    value={borderColor}
+                    onChange={(e) => handleColorChange(e.target.value, 'border')}
+                    className="w-full h-8 border rounded cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs">Border Width</label>
+                  <input
+                    type="number"
+                    value={borderWidth}
+                    onChange={(e) => setBorderWidth(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                    className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
+                    min="0"
+                    max="100"
+                  />
+                </div>
               </div>
+            </details>
 
-              <div className="flex-1">
-                <label className="text-xs">Border</label>
-                <input
-                  type="color"
-                  value={borderColor}
-                  onChange={(e) => handleColorChange(e.target.value, 'border')}
-                  className="w-full h-8 border rounded cursor-pointer"
-                />
+            <details className="group rounded border transition-all">
+              <summary className="cursor-pointer text-xs font-semibold py-2 px-3 hover:bg-gray-200 dark:hover:bg-[#3a3a3a]">
+                Z-Order
+              </summary>
+              <div className="px-3 pb-3 pt-2 grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => handleZIndexUpdate('bringToFront')}
+                  className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Bring to Front
+                </button>
+                <button
+                  onClick={() => handleZIndexUpdate('sendToBack')}
+                  className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Send to Back
+                </button>
+                <button
+                  onClick={() => handleZIndexUpdate('moveForward')}
+                  className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Move Forward
+                </button>
+                <button
+                  onClick={() => handleZIndexUpdate('moveBackward')}
+                  className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
+                >
+                  Move Backward
+                </button>
               </div>
-
-              <div className="flex-1">
-                <label className="text-xs">Border Width</label>
-                <input
-                  type="number"
-                  value={borderWidth}
-                  onChange={(e) => setBorderWidth(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                  className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                  min="0"
-                  max="100"
-                />
-              </div>
-            </div>
+            </details>
           </>
         )}
-      </div>
-
-      <div className="flex flex-col gap-2 pt-2 border-t mt-4">
-        <label className="text-xs font-medium">Z-Order</label>
-        <div className="grid grid-cols-2 gap-2">
-          <button
-            onClick={() => handleZIndexUpdate('bringToFront')}
-            className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Bring to Front
-          </button>
-          <button
-            onClick={() => handleZIndexUpdate('sendToBack')}
-            className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Send to Back
-          </button>
-          <button
-            onClick={() => handleZIndexUpdate('moveForward')}
-            className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Move Forward
-          </button>
-          <button
-            onClick={() => handleZIndexUpdate('moveBackward')}
-            className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
-          >
-            Move Backward
-          </button>
-        </div>
       </div>
     </div>
   );

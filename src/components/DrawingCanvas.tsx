@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { Moon, Sun, Plus, Trash2, Settings, Download, Upload, Save } from 'lucide-react';
+import { Moon, Sun, Plus, Trash2, Settings, Download, Upload, Save, Undo, Redo, Copy, Scissors, Clipboard, Home, Palette, Wrench, ChevronDown } from 'lucide-react';
 import { Panel } from './types';
 import PanelProperties from './PanelProperties';
 import ShapeDropdown from './ShapeDropdown';
-import UndoRedo from './UndoRedo';
 import DraggablePanel from './DraggablePanel';
 import { useKeyboardControls } from '../hooks/useKeyboardControls';
 import { useResize } from '../hooks/useResize';
@@ -30,6 +29,7 @@ export default function DrawingCanvas() {
   const [showGrid, setShowGrid] = useState<boolean>(false);
   const [showShapeDropdown, setShowShapeDropdown] = useState<boolean>(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<string>('home');
 
   const { saveToHistory, undo, redo, history, historyIndex } = useHistory(
     panels, setPanels,
@@ -90,239 +90,430 @@ export default function DrawingCanvas() {
     }
   };
 
+  const tabs = [
+    { id: 'home', label: 'Home', icon: Home },
+    { id: 'insert', label: 'Insert', icon: Plus },
+    { id: 'view', label: 'View', icon: Palette },
+    { id: 'format', label: 'Format', icon: Wrench }
+  ];
+
   return (
     <div
-      className="min-h-screen"
+      className="min-h-screen flex flex-col"
       style={{
-        background:
-          theme === 'dark'
-            ? '#111827'
-            : 'linear-gradient(221deg,rgba(238, 174, 199, 1) 17%, rgba(148, 165, 233, 1) 100%)',
+        background: theme === 'dark' ? '#1f1f1f' : '#fafafa',
       }}
     >
-      <PanelProperties
-        panel={selectedPanelData || null}
-        theme={theme}
-        onUpdateProperties={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
-          fontWeight, fontStyle, textDecoration, zAction) =>
-            updateSelectedPanelProperties(selectedPanel, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
-            fontWeight, fontStyle, textDecoration, zAction)
-        }
-        onClose={clearSelection}
-      />
-
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-white">
-            Layout Designer
-          </h1>
-          <div className="flex gap-4">
-            <UndoRedo
-              onUndo={undo}
-              onRedo={redo}
-              canUndo={historyIndex > 0}
-              canRedo={historyIndex < history.length - 1}
-              theme={theme}
-            />
-            <div className="relative shape-dropdown-container">
-              <button
-                onClick={() => setShowShapeDropdown(!showShapeDropdown)}
-                className={`p-2 rounded-lg ${theme === 'dark'
-                  ? 'bg-green-600 hover:bg-green-700'
-                  : 'bg-green-500 hover:bg-green-600'
-                  } text-white transition-colors`}
-              >
-                <div className="flex items-center gap-2">
-                  <Plus size={20} />
-                  <span>Add</span>
-                </div>
-              </button>
-              <ShapeDropdown
-                isOpen={showShapeDropdown}
-                onClose={() => setShowShapeDropdown(false)}
-                onSelectShape={addPanel}
-                theme={theme}
-              />
+      <div>
+        <div className={`${theme === 'dark' ? 'bg-gray-800' : 'bg-white'} border-b border-gray-300 shadow-sm`}>
+          <div className="flex items-center justify-between px-4">
+            {/* Tab Headers */}
+            <div className="flex">
+              {tabs.map((tab) => {
+                const IconComponent = tab.icon;
+                return (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center gap-2 px-4 py-2 text-sm font-medium transition-colors relative ${activeTab === tab.id
+                      ? theme === 'dark'
+                        ? 'bg-gray-700 text-yellow-400 border-b-2 border-yellow-400'
+                        : 'bg-gray-50 text-orange-600 border-b-2 border-orange-500'
+                      : theme === 'dark'
+                        ? 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                        : 'text-gray-700 hover:bg-gray-100'
+                      }`}
+                  >
+                    <IconComponent size={14} />
+                    {tab.label}
+                  </button>
+                );
+              })}
             </div>
-            <button
-              onClick={exportConfig}
-              className={`p-2 rounded-lg ${theme === 'dark'
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-blue-500 hover:bg-blue-600'
-                } text-white transition-colors`}
-            >
-              <Save size={20} />
-            </button>
-            <label
-              className={`p-2 rounded-lg ${theme === 'dark'
-                ? 'bg-blue-600 hover:bg-blue-700'
-                : 'bg-blue-500 hover:bg-blue-600'
-                } text-white transition-colors cursor-pointer`}
-            >
-              <Upload size={20} />
-              <input
-                type="file"
-                accept=".json"
-                onChange={importConfig}
-                className="hidden"
-              />
-            </label>
-            <button
-              onClick={exportToPNG}
-              className={`p-2 rounded-lg ${theme === 'dark'
-                ? 'bg-purple-600 hover:bg-purple-700'
-                : 'bg-purple-500 hover:bg-purple-600'
-                } text-white transition-colors`}
-            >
-              <Download size={20} />
-            </button>
-            <button
-              onClick={() => setIsEditingCanvas(!isEditingCanvas)}
-              className={`p-2 rounded-lg ${theme === 'dark'
-                ? 'bg-gray-600 hover:bg-gray-700'
-                : 'bg-gray-500 hover:bg-gray-600'
-                } text-white transition-colors`}
-            >
-              <Settings size={20} />
-            </button>
-            <button
-              onClick={clearPanels}
-              className={`p-2 rounded-lg ${theme === 'dark'
-                ? 'bg-red-600 hover:bg-red-700'
-                : 'bg-red-500 hover:bg-red-600'
-                } text-white transition-colors`}
-            >
-              <Trash2 size={20} />
-            </button>
-            <button
-              onClick={toggleTheme}
-              className={`p-2 rounded-lg ${theme === 'dark'
-                ? 'bg-yellow-600 hover:bg-yellow-700'
-                : 'bg-blue-500 hover:bg-blue-600'
-                } text-white transition-colors`}
-            >
-              {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
-            </button>
+
+            {/* Right-aligned Theme Toggle */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={toggleTheme}
+                className="hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded"
+              >
+                {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+              </button>
+            </div>
           </div>
         </div>
 
-        <div className="flex justify-center items-center">
-          <div
-            className={`relative border-2 canvas-container transition-colors duration-200 overflow-hidden ${roundedCorners ? 'rounded-xl' : ''
-              } ${showGrid ? 'grid-background' : ''}`}
-            style={{
-              width: canvasWidth,
-              height: canvasHeight,
-              backgroundColor: canvasBgColor,
-              color: canvasFgColor,
-              backgroundImage: showGrid
-                ? `linear-gradient(${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-                } 1px, transparent 1px),
-                   linear-gradient(90deg, ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'
-                } 1px, transparent 1px)`
-                : 'none',
-              backgroundSize: showGrid ? '20px 20px' : 'auto'
-            }}
-            onClick={handleCanvasClick}
-          >
-            {isEditingCanvas && (
-              <div className="absolute top-4 right-4 z-30 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-xl border dark:border-gray-700">
-                <div className="space-y-4">
-                  <div className="flex gap-2 items-center">
-                    <input
-                      type="number"
-                      value={newCanvasWidth}
-                      onChange={(e) => setNewCanvasWidth(e.target.value)}
-                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
-                      className={`w-16 h-8 text-sm font-mono rounded px-2 ${theme === 'dark'
-                        ? 'bg-gray-600 text-white border-gray-500'
-                        : 'bg-white text-gray-900 border-gray-300'
-                        } border`}
-                      min="200"
-                      max="1200"
-                      placeholder={canvasWidth.toString()}
-                    />
-                    <span className={`text-sm font-mono ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                      }`}>×</span>
-                    <input
-                      type="number"
-                      value={newCanvasHeight}
-                      onChange={(e) => setNewCanvasHeight(e.target.value)}
-                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
-                      className={`w-16 h-8 text-sm font-mono rounded px-2 ${theme === 'dark'
-                        ? 'bg-gray-600 text-white border-gray-500'
-                        : 'bg-white text-gray-900 border-gray-300'
-                        } border`}
-                      min="200"
-                      max="1200"
-                      placeholder={canvasHeight.toString()}
+        {/* Ribbon Content */}
+        <div className={`px-4 py-3 ${theme === 'dark' ? 'bg-gray-750' : 'bg-gray-50'} border-t border-gray-200`}>
+          {/* Home Tab */}
+          {activeTab === 'home' && (
+            <div className="flex items-start gap-6">
+              {/* File Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  File
+                </div>
+                <div className="flex gap-1">
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={exportConfig}
+                      className={`flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                        }`}
+                      title="Save Project"
+                    >
+                      <Save size={24} />
+                      <span className="text-xs">Save</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <label className={`flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors cursor-pointer ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      }`} title="Open Project">
+                      <Upload size={24} />
+                      <span className="text-xs">Open</span>
+                      <input
+                        type="file"
+                        accept=".json"
+                        onChange={importConfig}
+                        className="hidden"
+                      />
+                    </label>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={exportToPNG}
+                      className={`flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                        }`}
+                      title="Export as PNG"
+                    >
+                      <Download size={24} />
+                      <span className="text-xs">Export</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+
+              {/* Clipboard Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Clipboard
+                </div>
+                <div className="flex gap-1">
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={cut}
+                      disabled={!selectedPanel}
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${!selectedPanel
+                        ? 'opacity-50 cursor-not-allowed'
+                        : theme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-600'
+                          : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                      title="Cut"
+                    >
+                      <Scissors size={20} />
+                      <span className="text-xs">Cut</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={copy}
+                      disabled={!selectedPanel}
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${!selectedPanel
+                        ? 'opacity-50 cursor-not-allowed'
+                        : theme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-600'
+                          : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                      title="Copy"
+                    >
+                      <Copy size={20} />
+                      <span className="text-xs">Copy</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={paste}
+                      className={`flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                        }`}
+                      title="Paste"
+                    >
+                      <Clipboard size={20} />
+                      <span className="text-xs">Paste</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+
+              {/* Undo/Redo Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Actions
+                </div>
+                <div className="flex gap-1">
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={undo}
+                      disabled={historyIndex <= 0}
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${historyIndex <= 0
+                        ? 'opacity-50 cursor-not-allowed'
+                        : theme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-600'
+                          : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                      title="Undo"
+                    >
+                      <Undo size={20} />
+                      <span className="text-xs">Undo</span>
+                    </button>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={redo}
+                      disabled={historyIndex >= history.length - 1}
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${historyIndex >= history.length - 1
+                        ? 'opacity-50 cursor-not-allowed'
+                        : theme === 'dark'
+                          ? 'text-gray-300 hover:bg-gray-600'
+                          : 'text-gray-700 hover:bg-gray-200'
+                        }`}
+                      title="Redo"
+                    >
+                      <Redo size={20} />
+                      <span className="text-xs">Redo</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Insert Tab */}
+          {activeTab === 'insert' && (
+            <div className="flex items-start gap-6">
+              {/* Shapes Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Shapes
+                </div>
+                <div className="relative shape-dropdown-container">
+                  <button
+                    onClick={() => setShowShapeDropdown(!showShapeDropdown)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-colors ${theme === 'dark'
+                      ? 'bg-yellow-600 hover:bg-yellow-700'
+                      : 'bg-orange-500 hover:bg-orange-600'
+                      }`}
+                    title="Add Shape"
+                  >
+                    <Plus size={20} />
+                    <span className="text-sm">Add Shape</span>
+                    <ChevronDown size={16} />
+                  </button>
+                  <div className="relative z-50">
+                    <ShapeDropdown
+                      isOpen={showShapeDropdown}
+                      onClose={() => setShowShapeDropdown(false)}
+                      onSelectShape={addPanel}
+                      theme={theme}
                     />
                   </div>
-                  <div className="flex gap-4 items-center">
-                    <div className="flex flex-col gap-1">
-                      <label className={`text-xs font-mono ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                        }`}>Background</label>
+                </div>
+              </div>
+
+              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+
+              {/* Actions Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Actions
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <button
+                    onClick={clearPanels}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-white font-medium transition-colors ${theme === 'dark'
+                      ? 'bg-red-600 hover:bg-red-700'
+                      : 'bg-red-500 hover:bg-red-600'
+                      }`}
+                    title="Clear All"
+                  >
+                    <Trash2 size={16} />
+                    <span className="text-sm">Clear All</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* View Tab */}
+          {activeTab === 'view' && (
+            <div className="flex items-start gap-6">
+              {/* Canvas Theme Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Canvas Theme
+                </div>
+                <div className="flex gap-4 items-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <label className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Background</label>
                       <input
                         type="color"
                         value={canvasBgColor}
                         onChange={(e) => handleCanvasColorChange(e.target.value, 'bg')}
-                        className="w-8 h-8 rounded cursor-pointer"
+                        className="w-12 h-8 rounded cursor-pointer border border-gray-300"
                       />
                     </div>
-                    <div className="flex flex-col gap-1">
-                      <label className={`text-xs font-mono ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                        }`}>Foreground</label>
+                  </div>
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="flex flex-col items-center gap-1">
+                      <label className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Foreground</label>
                       <input
                         type="color"
                         value={canvasFgColor}
                         onChange={(e) => handleCanvasColorChange(e.target.value, 'fg')}
-                        className="w-8 h-8 rounded cursor-pointer"
+                        className="w-12 h-8 rounded cursor-pointer border border-gray-300"
                       />
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className={`text-xs font-mono ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                      }`}>Rounded Corners</label>
+                </div>
+              </div>
+
+              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+
+              {/* Display Options Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Display Options
+                </div>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <label className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Rounded Corners</label>
                     <button
                       onClick={() => handleToggleChange(setRoundedCorners, roundedCorners)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${roundedCorners
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${roundedCorners
                         ? theme === 'dark'
-                          ? 'bg-blue-600'
-                          : 'bg-blue-500'
+                          ? 'bg-yellow-600'
+                          : 'bg-orange-500'
                         : theme === 'dark'
                           ? 'bg-gray-600'
                           : 'bg-gray-300'
                         }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${roundedCorners ? 'translate-x-6' : 'translate-x-1'
+                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${roundedCorners ? 'translate-x-5' : 'translate-x-1'
                           }`}
                       />
                     </button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <label className={`text-xs font-mono ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                      }`}>Show Grid</label>
+                  <div className="flex items-center gap-3">
+                    <label className={`text-sm ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Show Grid</label>
                     <button
                       onClick={() => handleToggleChange(setShowGrid, showGrid)}
-                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${showGrid
+                      className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showGrid
                         ? theme === 'dark'
-                          ? 'bg-blue-600'
-                          : 'bg-blue-500'
+                          ? 'bg-yellow-600'
+                          : 'bg-orange-500'
                         : theme === 'dark'
                           ? 'bg-gray-600'
                           : 'bg-gray-300'
                         }`}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${showGrid ? 'translate-x-6' : 'translate-x-1'
+                        className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${showGrid ? 'translate-x-5' : 'translate-x-1'
                           }`}
                       />
                     </button>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
+          )}
+
+          {/* Format Tab */}
+          {activeTab === 'format' && (
+            <div className="flex items-start gap-6">
+              {/* Canvas Size Group */}
+              <div className="flex flex-col items-center">
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Canvas Size
+                </div>
+                <div className="flex gap-2 items-center">
+                  <div className="flex flex-col items-center gap-1">
+                    <label className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Width</label>
+                    <input
+                      type="number"
+                      value={newCanvasWidth}
+                      onChange={(e) => setNewCanvasWidth(e.target.value)}
+                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
+                      className={`w-20 h-8 text-sm text-center rounded border ${theme === 'dark'
+                        ? 'bg-gray-600 text-white border-gray-500'
+                        : 'bg-white text-gray-900 border-gray-300'
+                        }`}
+                      min="200"
+                      max="1200"
+                      placeholder={canvasWidth.toString()}
+                    />
+                  </div>
+                  <span className={`text-lg font-bold mt-4 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>×</span>
+                  <div className="flex flex-col items-center gap-1">
+                    <label className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Height</label>
+                    <input
+                      type="number"
+                      value={newCanvasHeight}
+                      onChange={(e) => setNewCanvasHeight(e.target.value)}
+                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
+                      className={`w-20 h-8 text-sm text-center rounded border ${theme === 'dark'
+                        ? 'bg-gray-600 text-white border-gray-500'
+                        : 'bg-white text-gray-900 border-gray-300'
+                        }`}
+                      min="200"
+                      max="1200"
+                      placeholder={canvasHeight.toString()}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div >
+
+      {/* Panel Properties */}
+      < PanelProperties
+        panel={selectedPanelData || null
+        }
+        theme={theme}
+        onUpdateProperties={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+          fontWeight, fontStyle, textDecoration, zAction) =>
+          updateSelectedPanelProperties(selectedPanel, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+            fontWeight, fontStyle, textDecoration, zAction)
+        }
+        onClose={clearSelection}
+      />
+
+      {/* Main Canvas Area */}
+      < div className="flex-1 px-8 py-6" >
+        <div className="flex justify-center items-center h-full">
+          <div
+            className={`relative border-2 canvas-container transition-colors duration-200 overflow-hidden ${roundedCorners ? 'rounded-xl' : ''
+              } ${showGrid ? 'grid-background' : ''} ${theme === 'dark' ? 'border-gray-600' : 'border-gray-300'
+              }`}
+            style={{
+              width: canvasWidth,
+              height: canvasHeight,
+              backgroundColor: canvasBgColor,
+              color: canvasFgColor,
+              backgroundImage: showGrid
+                ? `linear-gradient(${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 1px, transparent 1px),
+                   linear-gradient(90deg, ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 1px, transparent 1px)`
+                : 'none',
+              backgroundSize: showGrid ? '20px 20px' : 'auto'
+            }}
+            onClick={handleCanvasClick}
+          >
             {panels.map(panel => (
               <DraggablePanel
                 key={panel.id}
@@ -345,7 +536,7 @@ export default function DrawingCanvas() {
             ))}
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
