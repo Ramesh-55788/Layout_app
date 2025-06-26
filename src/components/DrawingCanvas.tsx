@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useTheme } from '../context/ThemeContext';
-import { Moon, Sun, Plus, Trash2, Settings, Download, Upload, Save, Undo, Redo, Copy, Scissors, Clipboard, Home, Palette, Wrench, ChevronDown } from 'lucide-react';
+import { Moon, Sun, Trash2, Download, Upload, Save, Undo, Redo, Copy, Scissors, Clipboard, Home, Palette, Wrench, ChevronDown } from 'lucide-react';
 import { Panel } from './types';
 import PanelProperties from './PanelProperties';
 import ShapeDropdown from './ShapeDropdown';
@@ -92,7 +92,6 @@ export default function DrawingCanvas() {
 
   const tabs = [
     { id: 'home', label: 'Home', icon: Home },
-    { id: 'insert', label: 'Insert', icon: Plus },
     { id: 'view', label: 'View', icon: Palette },
     { id: 'format', label: 'Format', icon: Wrench }
   ];
@@ -135,9 +134,9 @@ export default function DrawingCanvas() {
             <div className="flex items-center gap-2">
               <button
                 onClick={toggleTheme}
-                className="hover:bg-gray-200 dark:hover:bg-gray-700 p-1 rounded"
+                className="p-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-800 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white transition-colors"
               >
-                {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
+                {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
               </button>
             </div>
           </div>
@@ -196,7 +195,7 @@ export default function DrawingCanvas() {
 
               {/* Clipboard Group */}
               <div className="flex flex-col items-center">
-                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Clipboard
                 </div>
                 <div className="flex gap-1">
@@ -205,26 +204,23 @@ export default function DrawingCanvas() {
                       onClick={cut}
                       disabled={!selectedPanel}
                       className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${!selectedPanel
-                        ? 'opacity-50 cursor-not-allowed'
-                        : theme === 'dark'
-                          ? 'text-gray-300 hover:bg-gray-600'
-                          : 'text-gray-700 hover:bg-gray-200'
+                        ? theme === 'dark' ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : theme === 'dark' ? 'text-white bg-gray-700 hover:bg-gray-600' : 'text-gray-800 bg-gray-100 hover:bg-gray-200'
                         }`}
                       title="Cut"
                     >
                       <Scissors size={20} />
                       <span className="text-xs">Cut</span>
                     </button>
+
                   </div>
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={copy}
                       disabled={!selectedPanel}
                       className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${!selectedPanel
-                        ? 'opacity-50 cursor-not-allowed'
-                        : theme === 'dark'
-                          ? 'text-gray-300 hover:bg-gray-600'
-                          : 'text-gray-700 hover:bg-gray-200'
+                        ? theme === 'dark' ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : theme === 'dark' ? 'text-white bg-gray-700 hover:bg-gray-600' : 'text-gray-800 bg-gray-100 hover:bg-gray-200'
                         }`}
                       title="Copy"
                     >
@@ -235,7 +231,8 @@ export default function DrawingCanvas() {
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={paste}
-                      className={`flex flex-col items-center gap-1 p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${theme === 'dark'
+                        ? 'text-white bg-gray-700 hover:bg-gray-600' : 'text-gray-800 bg-gray-100 hover:bg-gray-200'
                         }`}
                       title="Paste"
                     >
@@ -246,23 +243,20 @@ export default function DrawingCanvas() {
                 </div>
               </div>
 
-              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`} />
 
-              {/* Undo/Redo Group */}
               <div className="flex flex-col items-center">
-                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
+                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
                   Actions
                 </div>
-                <div className="flex gap-1">
+                <div className="flex gap-2">
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={undo}
                       disabled={historyIndex <= 0}
                       className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${historyIndex <= 0
-                        ? 'opacity-50 cursor-not-allowed'
-                        : theme === 'dark'
-                          ? 'text-gray-300 hover:bg-gray-600'
-                          : 'text-gray-700 hover:bg-gray-200'
+                        ? theme === 'dark' ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : theme === 'dark' ? 'text-white bg-gray-700 hover:bg-gray-600' : 'text-gray-800 bg-gray-100 hover:bg-gray-200'
                         }`}
                       title="Undo"
                     >
@@ -270,15 +264,14 @@ export default function DrawingCanvas() {
                       <span className="text-xs">Undo</span>
                     </button>
                   </div>
+
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={redo}
                       disabled={historyIndex >= history.length - 1}
                       className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${historyIndex >= history.length - 1
-                        ? 'opacity-50 cursor-not-allowed'
-                        : theme === 'dark'
-                          ? 'text-gray-300 hover:bg-gray-600'
-                          : 'text-gray-700 hover:bg-gray-200'
+                        ? theme === 'dark' ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : theme === 'dark' ? 'text-white bg-gray-700 hover:bg-gray-600' : 'text-gray-800 bg-gray-100 hover:bg-gray-200'
                         }`}
                       title="Redo"
                     >
@@ -286,15 +279,25 @@ export default function DrawingCanvas() {
                       <span className="text-xs">Redo</span>
                     </button>
                   </div>
+
+                  <div className="flex flex-col items-center gap-1">
+                    <button
+                      onClick={clearPanels}
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors text-white ${theme === 'dark'
+                        ? 'bg-red-600 hover:bg-red-700'
+                        : 'bg-red-500 hover:bg-red-600'
+                        }`}
+                      title="Clear All"
+                    >
+                      <Trash2 size={15} />
+                    </button>
+                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Clear</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Insert Tab */}
-          {activeTab === 'insert' && (
-            <div className="flex items-start gap-6">
-              {/* Shapes Group */}
+              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+
               <div className="flex flex-col items-center">
                 <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
                   Shapes
@@ -302,15 +305,15 @@ export default function DrawingCanvas() {
                 <div className="relative shape-dropdown-container">
                   <button
                     onClick={() => setShowShapeDropdown(!showShapeDropdown)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-white font-medium transition-colors ${theme === 'dark'
-                      ? 'bg-yellow-600 hover:bg-yellow-700'
-                      : 'bg-orange-500 hover:bg-orange-600'
+                    className={`flex items-center justify-center p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors ${theme === 'dark' ? 'text-white' : 'text-black'
                       }`}
                     title="Add Shape"
                   >
-                    <Plus size={20} />
-                    <span className="text-sm">Add Shape</span>
-                    <ChevronDown size={16} />
+                    <div className="relative w-8 h-8">
+                      <div className="absolute w-7 h-7 bg-blue-400 border border-blue-800 top-0 left-0" />
+                      <div className="absolute w-7 h-7 bg-white border border-black rounded-full top-1 left-2" />
+                    </div>
+                    <ChevronDown size={20} className="ml-1" />
                   </button>
                   <div className="relative z-50">
                     <ShapeDropdown
@@ -320,28 +323,6 @@ export default function DrawingCanvas() {
                       theme={theme}
                     />
                   </div>
-                </div>
-              </div>
-
-              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
-
-              {/* Actions Group */}
-              <div className="flex flex-col items-center">
-                <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
-                  Actions
-                </div>
-                <div className="flex flex-col items-center gap-1">
-                  <button
-                    onClick={clearPanels}
-                    className={`flex items-center gap-2 px-3 py-2 rounded-lg text-white font-medium transition-colors ${theme === 'dark'
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-red-500 hover:bg-red-600'
-                      }`}
-                    title="Clear All"
-                  >
-                    <Trash2 size={16} />
-                    <span className="text-sm">Clear All</span>
-                  </button>
                 </div>
               </div>
             </div>
@@ -394,12 +375,8 @@ export default function DrawingCanvas() {
                     <button
                       onClick={() => handleToggleChange(setRoundedCorners, roundedCorners)}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${roundedCorners
-                        ? theme === 'dark'
-                          ? 'bg-yellow-600'
-                          : 'bg-orange-500'
-                        : theme === 'dark'
-                          ? 'bg-gray-600'
-                          : 'bg-gray-300'
+                        ? theme === 'dark' ? 'bg-yellow-600' : 'bg-orange-500'
+                        : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'
                         }`}
                     >
                       <span
@@ -413,12 +390,8 @@ export default function DrawingCanvas() {
                     <button
                       onClick={() => handleToggleChange(setShowGrid, showGrid)}
                       className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${showGrid
-                        ? theme === 'dark'
-                          ? 'bg-yellow-600'
-                          : 'bg-orange-500'
-                        : theme === 'dark'
-                          ? 'bg-gray-600'
-                          : 'bg-gray-300'
+                        ? theme === 'dark' ? 'bg-yellow-600' : 'bg-orange-500'
+                        : theme === 'dark' ? 'bg-gray-600' : 'bg-gray-700'
                         }`}
                     >
                       <span
@@ -507,8 +480,8 @@ export default function DrawingCanvas() {
               backgroundColor: canvasBgColor,
               color: canvasFgColor,
               backgroundImage: showGrid
-                ? `linear-gradient(${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 1px, transparent 1px),
-                   linear-gradient(90deg, ${theme === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'} 1px, transparent 1px)`
+                ? `linear-gradient(rgba(0,0,0,0.1) 1px, transparent 1px),
+                     linear-gradient(90deg, rgba(0,0,0,0.1) 1px, transparent 1px)`
                 : 'none',
               backgroundSize: showGrid ? '20px 20px' : 'auto'
             }}

@@ -84,7 +84,7 @@ function ShapeDropdown({ isOpen, onClose, onSelectShape, theme }: ShapeDropdownP
 
   return (
     <div
-      className={`absolute top-12 left-0 z-50 rounded-lg shadow-2xl border-2 p-4 grid grid-cols-3 gap-2 ${theme === 'dark'
+      className={`absolute top-5 left-0 z-50 rounded-lg shadow-2xl border-2 p-4 grid grid-cols-3 gap-2 ${theme === 'dark'
         ? 'bg-gray-800 border-gray-600 text-white'
         : 'bg-white border-gray-300 text-gray-900'
         }`}

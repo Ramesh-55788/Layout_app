@@ -91,12 +91,10 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
       action
     );
   };
-
   return (
-    <div className={`fixed top-28 right-3 z-50 p-4 rounded-xl shadow-xl border w-[300px] font-sans transition-all duration-300 ${theme === 'dark'
-        ? 'bg-[#2b2b2b] border-[#3f3f3f] text-white'
-        : 'bg-[#f3f3f3] border-[#d0d0d0] text-[#323130]'
-      }`}>
+    <div className={`fixed top-20 right-3 z-50 p-4 rounded-xl shadow-xl border w-[300px] font-sans transition-all duration-300 overflow-hidden
+      ${theme === 'dark' ? 'bg-[#2b2b2b] border-[#3f3f3f] text-white' : 'bg-[#f3f3f3] border-[#d0d0d0] text-[#323130]'}`}>
+
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-sm font-semibold uppercase tracking-wide">Properties</h3>
         <button
@@ -110,7 +108,7 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
         </button>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto pr-1">
         <button
           onClick={handleUpdate}
           className="w-full py-2 rounded bg-[#0078d4] hover:bg-[#106ebe] text-white text-sm font-semibold"
@@ -177,32 +175,34 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
                 Text & Font
               </summary>
               <div className="px-3 pb-3 pt-2 space-y-2">
-                <div>
-                  <label className="text-xs">Text</label>
-                  <input
-                    type="text"
-                    value={text}
-                    onChange={(e) => setText(e.target.value)}
-                    onKeyDown={(e) => {
-                      e.stopPropagation();
-                      if (e.key === 'Enter') handleUpdate();
-                    }}
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                    placeholder="Enter text"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs">Font Size</label>
-                  <input
-                    type="number"
-                    value={fontSize}
-                    onChange={(e) => setFontSize(parseInt(e.target.value))}
-                    onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
-                    className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
-                    min="0"
-                    max="100"
-                  />
+                <div className="flex gap-4">
+                  <div className="w-1/2">
+                    <label className="text-xs">Text</label>
+                    <input
+                      type="text"
+                      value={text}
+                      onChange={(e) => setText(e.target.value)}
+                      onKeyDown={(e) => {
+                        e.stopPropagation();
+                        if (e.key === 'Enter') handleUpdate();
+                      }}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
+                      placeholder="Enter text"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="text-xs">Font Size</label>
+                    <input
+                      type="number"
+                      value={fontSize}
+                      onChange={(e) => setFontSize(parseInt(e.target.value))}
+                      onKeyDown={(e) => e.key === 'Enter' && handleUpdate()}
+                      className="w-full px-2 py-1 border rounded text-sm bg-white text-black"
+                      min="0"
+                      max="100"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs">Text Color</label>
@@ -265,23 +265,25 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
                 Background & Border
               </summary>
               <div className="px-3 pb-3 pt-2 space-y-2">
-                <div>
-                  <label className="text-xs">Background</label>
-                  <input
-                    type="color"
-                    value={bgColor}
-                    onChange={(e) => handleColorChange(e.target.value, 'background')}
-                    className="w-full h-8 border rounded cursor-pointer"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs">Border Color</label>
-                  <input
-                    type="color"
-                    value={borderColor}
-                    onChange={(e) => handleColorChange(e.target.value, 'border')}
-                    className="w-full h-8 border rounded cursor-pointer"
-                  />
+                <div className="flex gap-4">
+                  <div className="w-1/2">
+                    <label className="text-xs">Background</label>
+                    <input
+                      type="color"
+                      value={bgColor}
+                      onChange={(e) => handleColorChange(e.target.value, 'background')}
+                      className="w-full h-8 border rounded cursor-pointer"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="text-xs">Border Color</label>
+                    <input
+                      type="color"
+                      value={borderColor}
+                      onChange={(e) => handleColorChange(e.target.value, 'border')}
+                      className="w-full h-8 border rounded cursor-pointer"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="text-xs">Border Width</label>
@@ -319,13 +321,13 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
                   onClick={() => handleZIndexUpdate('moveForward')}
                   className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
                 >
-                  Move Forward
+                  Forward
                 </button>
                 <button
                   onClick={() => handleZIndexUpdate('moveBackward')}
                   className="px-2 py-1 text-sm rounded bg-blue-500 hover:bg-blue-600 text-white"
                 >
-                  Move Backward
+                  Backward
                 </button>
               </div>
             </details>

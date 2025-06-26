@@ -78,7 +78,6 @@ function ResizeHandles({ isSelected, onResizeStart }: ResizeHandlesProps) {
 export default function DraggablePanel({
   panel,
   selectedPanel,
-  isCtrlPressed,
   moveMode,
   isResizing,
   roundedCorners,
@@ -100,7 +99,7 @@ export default function DraggablePanel({
       position={{ x: panel.x, y: panel.y }}
       onStop={(e, data) => onDragStop(panel.id, e, data)}
       bounds="parent"
-      disabled={(!isCtrlPressed && !moveMode) || isResizing}
+      disabled={(moveMode) || isResizing}
     >
       <div
         ref={nodeRef}
