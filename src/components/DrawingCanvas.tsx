@@ -283,15 +283,17 @@ export default function DrawingCanvas() {
                   <div className="flex flex-col items-center gap-1">
                     <button
                       onClick={clearPanels}
-                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors text-white ${theme === 'dark'
-                        ? 'bg-red-600 hover:bg-red-700'
-                        : 'bg-red-500 hover:bg-red-600'
+                      className={`flex flex-col items-center gap-1 p-2 rounded transition-colors ${theme === 'dark'
+                        ? 'bg-gray-800 text-white hover:bg-gray-700'
+                        : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                         }`}
                       title="Clear All"
                     >
-                      <Trash2 size={15} />
+                      <Trash2 size={20} color="red" />
+                      <span className={`text-xs ${theme === 'dark' ? 'text-white' : 'text-gray-700'}`}>
+                        Clear
+                      </span>
                     </button>
-                    <span className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>Clear</span>
                   </div>
                 </div>
               </div>
@@ -443,7 +445,7 @@ export default function DrawingCanvas() {
                         : 'bg-white text-gray-900 border-gray-300'
                         }`}
                       min="200"
-                      max="1200"
+                      max="720"
                       placeholder={canvasHeight.toString()}
                     />
                   </div>

@@ -62,6 +62,21 @@ export const useHistory = (
   ]);
 
   useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+      event.returnValue = 'Changes you made may not be saved.';
+    };
+  
+    const shouldWarn = panels.length > 0 || history.length > 0;
+  
+    if (shouldWarn) {
+      window.addEventListener('beforeunload', handleBeforeUnload);
+    }
+  
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [panels.length, history.length]);
+  
+  useEffect(() => {
     if (history.length === 0) {
       saveToHistory();
     }
