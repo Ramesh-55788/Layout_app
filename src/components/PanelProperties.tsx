@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { PanelPropertiesProps } from './types.ts';
 import FontStyleSelector from './FontStyleSelector.tsx';
 
 function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing, setIsEditing }: PanelPropertiesProps) {
+  if (!panel) return null;
   const [editWidth, setEditWidth] = useState('');
   const [editHeight, setEditHeight] = useState('');
   const [bgColor, setBgColor] = useState('#ffffff');
@@ -14,6 +15,7 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
   const [fontWeight, setFontWeight] = useState<'normal' | 'bold'>('normal');
   const [fontStyle, setFontStyle] = useState<'normal' | 'italic'>('normal');
   const [textDecoration, setTextDecoration] = useState<'none' | 'underline'>('none');
+  const [rotation, setRotation] = useState(panel.rotation || 0);
 
   useEffect(() => {
     if (panel) {
@@ -28,24 +30,29 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
       setFontWeight(panel.fontWeight || 'normal');
       setFontStyle(panel.fontStyle || 'normal');
       setTextDecoration(panel.textDecoration || 'none');
+      setRotation(panel.rotation || 0);
     }
   }, [panel]);
 
-  if (!panel) return null;
+  const rotationRef = useRef(rotation);
 
   const handleColorChange = (color: string, type: 'background' | 'border') => {
+    const width = parseInt(editWidth);
+    const height = parseInt(editHeight);
+    const borderW = parseInt(borderWidth);
+
     if (type === 'background') {
       setBgColor(color);
-      onUpdateProperties(parseInt(editWidth), parseInt(editHeight), color, borderColor, text, parseInt(borderWidth), textColor, fontSize,
-        fontWeight,
-        fontStyle,
-        textDecoration);
+      onUpdateProperties(
+        width, height, color, borderColor, text, borderW, textColor, fontSize, fontWeight,
+        fontStyle, textDecoration, undefined, rotationRef.current
+      );
     } else {
       setBorderColor(color);
-      onUpdateProperties(parseInt(editWidth), parseInt(editHeight), bgColor, color, text, parseInt(borderWidth), textColor, fontSize,
-        fontWeight,
-        fontStyle,
-        textDecoration);
+      onUpdateProperties(
+        width, height, bgColor, color, text, borderW, textColor, fontSize,
+        fontWeight, fontStyle, textDecoration, undefined, rotationRef.current
+      );
     }
   };
 
@@ -63,9 +70,8 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
     setFontSize(clampedFontSize);
 
     onUpdateProperties(width, height, bgColor, borderColor, text, borderW, textColor, clampedFontSize,
-      fontWeight,
-      fontStyle,
-      textDecoration);
+      fontWeight, fontStyle, textDecoration, undefined, rotationRef.current
+    );
   };
 
   const handleZIndexUpdate = (action: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward') => {
@@ -74,21 +80,11 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
     const borderW = Math.max(0, Math.min(100, parseInt(borderWidth) || 1));
     const clampedFontSize = Math.max(8, Math.min(100, fontSize));
 
-    onUpdateProperties(
-      width,
-      height,
-      bgColor,
-      borderColor,
-      text,
-      borderW,
-      textColor,
-      clampedFontSize,
-      fontWeight,
-      fontStyle,
-      textDecoration,
-      action
+    onUpdateProperties(width, height, bgColor, borderColor, text, borderW, textColor, clampedFontSize,
+      fontWeight, fontStyle, textDecoration, action,
     );
   };
+
   return (
     <div className={`fixed top-20 right-3 z-50 p-4 rounded-xl shadow-xl border w-[300px] font-sans transition-all duration-300 overflow-hidden
       ${theme === 'dark' ? 'bg-[#2b2b2b] border-[#3f3f3f] text-white' : 'bg-[#f3f3f3] border-[#d0d0d0] text-[#323130]'}`}>
@@ -211,17 +207,8 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
                       const newColor = e.target.value;
                       setTextColor(newColor);
                       onUpdateProperties(
-                        parseInt(editWidth),
-                        parseInt(editHeight),
-                        bgColor,
-                        borderColor,
-                        text,
-                        parseInt(borderWidth),
-                        newColor,
-                        fontSize,
-                        fontWeight,
-                        fontStyle,
-                        textDecoration
+                        parseInt(editWidth), parseInt(editHeight), bgColor, borderColor, text,
+                        parseInt(borderWidth), newColor, fontSize, fontWeight, fontStyle, textDecoration
                       );
                     }}
                     className="w-full h-8 border rounded cursor-pointer"
@@ -241,17 +228,8 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
                     setTextDecoration(underline);
                     handleUpdate();
                     onUpdateProperties(
-                      parseInt(editWidth),
-                      parseInt(editHeight),
-                      bgColor,
-                      borderColor,
-                      text,
-                      parseInt(borderWidth),
-                      textColor,
-                      fontSize,
-                      weight,
-                      italic,
-                      underline
+                      parseInt(editWidth), parseInt(editHeight), bgColor, borderColor, text, parseInt(borderWidth),
+                      textColor, fontSize, weight, italic, underline
                     );
                   }}
                 />
@@ -327,6 +305,49 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
                 >
                   Backward
                 </button>
+              </div>
+            </details>
+
+            <details className="group rounded border transition-all">
+              <summary className="cursor-pointer text-xs font-semibold py-2 px-3 hover:bg-gray-200 dark:hover:bg-[#3a3a3a]">
+                Rotation
+              </summary>
+              <div className="px-3 pb-3 pt-2 space-y-2">
+                <label className="text-xs">Degrees</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    value={Math.max(0, Math.min(360, rotation))}
+                    onChange={(e) => {
+                      setRotation(parseInt(e.target.value));
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        setRotation(rotation);
+                        handleUpdate();
+                      }
+                    }}
+                    className="w-full px-2 py-1 border rounded text-sm bg-white text-black flex-1"
+                  />
+                  <input
+                    type="range"
+                    min="0"
+                    max="360"
+                    value={rotation}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value);
+                      setRotation(val);
+                      rotationRef.current = val;
+                    }}
+                    onMouseUp={() => {
+                      onUpdateProperties(
+                        parseInt(editWidth), parseInt(editHeight), bgColor, borderColor, text, parseInt(borderWidth),
+                        textColor, fontSize, fontWeight, fontStyle, textDecoration, undefined, rotationRef.current
+                      );
+                    }}
+                    className="w-full h-2 bg-gray-200 rounded appearance-none cursor-pointer flex-1"
+                  />
+                </div>
               </div>
             </details>
           </>

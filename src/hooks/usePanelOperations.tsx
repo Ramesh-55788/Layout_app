@@ -48,7 +48,8 @@ export const usePanelOperations = (
     fontWeight: 'normal' | 'bold',
     fontStyle: 'normal' | 'italic',
     textDecoration: 'none' | 'underline',
-    zAction?: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward'
+    zAction?: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward',
+    rotation?: number
   ) => {
     if (!selectedPanel) return;
 
@@ -63,7 +64,8 @@ export const usePanelOperations = (
       fontSize,
       fontWeight,
       fontStyle,
-      textDecoration
+      textDecoration,
+      rotation
     };
 
     setPanels(prevPanels => {
@@ -117,7 +119,8 @@ export const usePanelOperations = (
           bgColor: '#ffffff',
           borderColor: '#D4D4D4',
           borderWidth: 1,
-          shape
+          shape,
+          rotation: 0
         }
       ]);
       saveToHistory();

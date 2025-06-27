@@ -15,6 +15,7 @@ export interface Panel {
   fontWeight?: 'normal' | 'bold';
   fontStyle?: 'normal' | 'italic';
   textDecoration?: 'none' | 'underline';
+  rotation?: number;
 }
 
 export interface PanelPropertiesProps {
@@ -32,7 +33,8 @@ export interface PanelPropertiesProps {
     fontWeight: 'normal' | 'bold',
     fontStyle: 'normal' | 'italic',
     textDecoration: 'none' | 'underline',
-    zAction?: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward'
+    zAction?: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward',
+    rotation?: number
   ) => void;
   onClose: () => void;
   isEditing: boolean;

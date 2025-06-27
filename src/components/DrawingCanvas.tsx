@@ -459,10 +459,10 @@ export default function DrawingCanvas() {
           panel={panels.find(p => p.id === propertiesPanelId)!}
           theme={theme}
           onUpdateProperties={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
-            fontWeight, fontStyle, textDecoration, zAction) =>
+            fontWeight, fontStyle, textDecoration, zAction, rotation) =>
             updateSelectedPanelProperties(
               propertiesPanelId, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
-              fontWeight, fontStyle, textDecoration, zAction
+              fontWeight, fontStyle, textDecoration, zAction, rotation
             )
           }
           onClose={() => {
