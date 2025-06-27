@@ -44,11 +44,16 @@ export const useHistory = (
 
     setHistory(prev => {
       const newHistory = prev.slice(0, historyIndex + 1);
+      const last = newHistory[newHistory.length - 1];
+      const isDuplicate = last && JSON.stringify(last) === JSON.stringify(currentState);
+
+      if (isDuplicate) return prev;
+
       newHistory.push(currentState);
-      const trimmedHistory =
-        newHistory.length > 50 ? newHistory.slice(1) : newHistory;
-      setHistoryIndex(trimmedHistory.length - 1);
-      return trimmedHistory;
+      const trimmed = newHistory.length > 50 ? newHistory.slice(1) : newHistory;
+      setHistoryIndex(trimmed.length - 1);
+
+      return trimmed;
     });
   }, [
     panels,
@@ -66,16 +71,16 @@ export const useHistory = (
       event.preventDefault();
       event.returnValue = 'Changes you made may not be saved.';
     };
-  
+
     const shouldWarn = panels.length > 0 || history.length > 0;
-  
+
     if (shouldWarn) {
       window.addEventListener('beforeunload', handleBeforeUnload);
     }
-  
+
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [panels.length, history.length]);
-  
+
   useEffect(() => {
     if (history.length === 0) {
       saveToHistory();
@@ -92,7 +97,10 @@ export const useHistory = (
       setCanvasFgColor(prevState.canvasFgColor);
       setRoundedCorners(prevState.roundedCorners);
       setShowGrid(prevState.showGrid);
-      setHistoryIndex(prev => prev - 1);
+      setHistoryIndex(prev => {
+        const newIndex = prev - 1;
+        return newIndex;
+      });
       setSelectedPanel(null);
     }
   }, [history, historyIndex]);
@@ -107,7 +115,10 @@ export const useHistory = (
       setCanvasFgColor(nextState.canvasFgColor);
       setRoundedCorners(nextState.roundedCorners);
       setShowGrid(nextState.showGrid);
-      setHistoryIndex(prev => prev + 1);
+      setHistoryIndex(prev => {
+        const newIndex = prev + 1;
+        return newIndex;
+      });
       setSelectedPanel(null);
     }
   }, [history, historyIndex]);

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { PanelPropertiesProps } from './types.ts';
 import FontStyleSelector from './FontStyleSelector.tsx';
 
-function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPropertiesProps) {
+function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing, setIsEditing }: PanelPropertiesProps) {
   const [editWidth, setEditWidth] = useState('');
   const [editHeight, setEditHeight] = useState('');
   const [bgColor, setBgColor] = useState('#ffffff');
@@ -10,7 +10,6 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
   const [text, setText] = useState('');
   const [textColor, setTextColor] = useState('#000000');
   const [borderWidth, setBorderWidth] = useState('1');
-  const [isEditing, setIsEditing] = useState(false);
   const [fontSize, setFontSize] = useState(16);
   const [fontWeight, setFontWeight] = useState<'normal' | 'bold'>('normal');
   const [fontStyle, setFontStyle] = useState<'normal' | 'italic'>('normal');
@@ -29,7 +28,6 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose }: PanelPro
       setFontWeight(panel.fontWeight || 'normal');
       setFontStyle(panel.fontStyle || 'normal');
       setTextDecoration(panel.textDecoration || 'none');
-      setIsEditing(true);
     }
   }, [panel]);
 

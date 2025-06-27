@@ -9,8 +9,7 @@ export const useCanvasControls = (
 ) => {
   const handleCanvasDimensionSubmit = (
     newCanvasWidth: string,
-    newCanvasHeight: string,
-    setIsEditingCanvas: Dispatch<SetStateAction<boolean>>
+    newCanvasHeight: string
   ) => {
     const width = parseInt(newCanvasWidth);
     const height = parseInt(newCanvasHeight);
@@ -19,19 +18,15 @@ export const useCanvasControls = (
       setCanvasHeight(height);
       saveToHistory();
     }
-    setIsEditingCanvas(false);
   };
 
   const handleCanvasKeyDown = (
     e: KeyboardEvent,
     newCanvasWidth: string,
-    newCanvasHeight: string,
-    setIsEditingCanvas: Dispatch<SetStateAction<boolean>>
+    newCanvasHeight: string
   ) => {
     if (e.key === 'Enter') {
-      handleCanvasDimensionSubmit(newCanvasWidth, newCanvasHeight, setIsEditingCanvas);
-    } else if (e.key === 'Escape') {
-      setIsEditingCanvas(false);
+      handleCanvasDimensionSubmit(newCanvasWidth, newCanvasHeight);
     }
   };
 

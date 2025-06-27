@@ -20,7 +20,6 @@ export default function DrawingCanvas() {
   const [moveMode, setMoveMode] = useState<boolean>(false);
   const [canvasWidth, setCanvasWidth] = useState<number>(1280);
   const [canvasHeight, setCanvasHeight] = useState<number>(720);
-  const [isEditingCanvas, setIsEditingCanvas] = useState<boolean>(false);
   const [newCanvasWidth, setNewCanvasWidth] = useState<string>('');
   const [newCanvasHeight, setNewCanvasHeight] = useState<string>('');
   const [canvasBgColor, setCanvasBgColor] = useState<string>('#ffffff');
@@ -30,6 +29,8 @@ export default function DrawingCanvas() {
   const [showShapeDropdown, setShowShapeDropdown] = useState<boolean>(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>('home');
+  const [propertiesPanelId, setPropertiesPanelId] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
 
   const { saveToHistory, undo, redo, history, historyIndex } = useHistory(
     panels, setPanels,
@@ -71,12 +72,6 @@ export default function DrawingCanvas() {
     showGrid, setShowGrid,
     saveToHistory
   );
-
-  const clearSelection = () => {
-    setSelectedPanel(null);
-  };
-
-  const selectedPanelData = panels.find(panel => panel.id === selectedPanel);
 
   const toggleMoveMode = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -143,7 +138,7 @@ export default function DrawingCanvas() {
         </div>
 
         {/* Ribbon Content */}
-        <div className={`px-4 py-3 ${theme === 'dark' ? 'bg-gray-750' : 'bg-gray-50'} border-t border-gray-200`}>
+        <div className={`px-4 py-3 mt-1 rounded-b-md border ${theme === 'dark' ? 'bg-gray-750 border-gray-600' : 'bg-gray-50 border-gray-300'}`}>
           {/* Home Tab */}
           {activeTab === 'home' && (
             <div className="flex items-start gap-6">
@@ -191,7 +186,7 @@ export default function DrawingCanvas() {
                 </div>
               </div>
 
-              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+              <div className={`w-px h-20 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
               {/* Clipboard Group */}
               <div className="flex flex-col items-center">
@@ -243,7 +238,7 @@ export default function DrawingCanvas() {
                 </div>
               </div>
 
-              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-700' : 'bg-gray-300'}`} />
+              <div className={`w-px h-20 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
               <div className="flex flex-col items-center">
                 <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-300' : 'text-gray-700'}`}>
@@ -298,7 +293,7 @@ export default function DrawingCanvas() {
                 </div>
               </div>
 
-              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+              <div className={`w-px h-20 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
               <div className="flex flex-col items-center">
                 <div className={`text-xs font-medium mb-2 ${theme === 'dark' ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -342,10 +337,11 @@ export default function DrawingCanvas() {
                   <div className="flex flex-col items-center gap-2">
                     <div className="flex flex-col items-center gap-1">
                       <label className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Background</label>
-                      <input
-                        type="color"
+                      <input type="color"
                         value={canvasBgColor}
                         onChange={(e) => handleCanvasColorChange(e.target.value, 'bg')}
+                        onMouseUp={saveToHistory}
+                        onBlur={saveToHistory}
                         className="w-12 h-8 rounded cursor-pointer border border-gray-300"
                       />
                     </div>
@@ -353,10 +349,11 @@ export default function DrawingCanvas() {
                   <div className="flex flex-col items-center gap-2">
                     <div className="flex flex-col items-center gap-1">
                       <label className={`text-xs ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>Foreground</label>
-                      <input
-                        type="color"
+                      <input type="color"
                         value={canvasFgColor}
                         onChange={(e) => handleCanvasColorChange(e.target.value, 'fg')}
+                        onMouseUp={saveToHistory}
+                        onBlur={saveToHistory}
                         className="w-12 h-8 rounded cursor-pointer border border-gray-300"
                       />
                     </div>
@@ -364,7 +361,7 @@ export default function DrawingCanvas() {
                 </div>
               </div>
 
-              <div className={`w-px h-16 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
+              <div className={`w-px h-20 ${theme === 'dark' ? 'bg-gray-600' : 'bg-gray-300'}`}></div>
 
               {/* Display Options Group */}
               <div className="flex flex-col items-center">
@@ -422,7 +419,7 @@ export default function DrawingCanvas() {
                       type="number"
                       value={newCanvasWidth}
                       onChange={(e) => setNewCanvasWidth(e.target.value)}
-                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
+                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight)}
                       className={`w-20 h-8 text-sm text-center rounded border ${theme === 'dark'
                         ? 'bg-gray-600 text-white border-gray-500'
                         : 'bg-white text-gray-900 border-gray-300'
@@ -439,7 +436,7 @@ export default function DrawingCanvas() {
                       type="number"
                       value={newCanvasHeight}
                       onChange={(e) => setNewCanvasHeight(e.target.value)}
-                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight, setIsEditingCanvas)}
+                      onKeyDown={(e) => handleCanvasKeyDown(e, newCanvasWidth, newCanvasHeight)}
                       className={`w-20 h-8 text-sm text-center rounded border ${theme === 'dark'
                         ? 'bg-gray-600 text-white border-gray-500'
                         : 'bg-white text-gray-900 border-gray-300'
@@ -457,17 +454,25 @@ export default function DrawingCanvas() {
       </div >
 
       {/* Panel Properties */}
-      < PanelProperties
-        panel={selectedPanelData || null
-        }
-        theme={theme}
-        onUpdateProperties={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
-          fontWeight, fontStyle, textDecoration, zAction) =>
-          updateSelectedPanelProperties(selectedPanel, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
-            fontWeight, fontStyle, textDecoration, zAction)
-        }
-        onClose={clearSelection}
-      />
+      {propertiesPanelId && (
+        <PanelProperties
+          panel={panels.find(p => p.id === propertiesPanelId)!}
+          theme={theme}
+          onUpdateProperties={(width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+            fontWeight, fontStyle, textDecoration, zAction) =>
+            updateSelectedPanelProperties(
+              propertiesPanelId, width, height, bgColor, borderColor, text, borderWidth, textColor, fontSize,
+              fontWeight, fontStyle, textDecoration, zAction
+            )
+          }
+          onClose={() => {
+            setPropertiesPanelId(null);
+            setIsEditing(false);
+          }}
+          isEditing={isEditing}
+          setIsEditing={setIsEditing}
+        />
+      )}
 
       {/* Main Canvas Area */}
       < div className="flex-1 px-8 py-6" >
@@ -507,6 +512,10 @@ export default function DrawingCanvas() {
                 onResizeStart={handleResizeStart}
                 setEditingId={setEditingId}
                 updatePanelText={updatePanelText}
+                propertiesPanelId={propertiesPanelId}
+                setPropertiesPanelId={setPropertiesPanelId}
+                isEditing={isEditing}
+                setIsEditing={setIsEditing}
               />
             ))}
           </div>

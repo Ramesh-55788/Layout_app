@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import { Panel } from './types';
 
 interface EditablePanelTextProps {
@@ -9,106 +8,65 @@ interface EditablePanelTextProps {
 }
 
 function EditablePanelText({
-  panel,
-  isEditing,
-  setEditingId,
-  updatePanelText,
+  panel
 }: EditablePanelTextProps) {
-  const [text, setText] = useState(panel.text || '');
-
-  useEffect(() => {
-    setText(panel.text || '');
-  }, [panel.text]);
-
-  const handleBlur = () => {
-    updatePanelText(panel.id, text.trim());
-    setEditingId(null);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleBlur();
-    }
-  };
-
-  const fontSize = Math.max(12, Math.min(panel.width, panel.height) / 10);
+  const fontSize = panel.fontSize || Math.max(12, Math.min(panel.width, panel.height) / 10);
   const textColor = panel.textColor || '#000000';
 
   const shapeBoundRatio = {
-    rectangle: 0.9,
-    square: 0.9,
-    circle: 0.75,
-    triangle: 0.4,
-    diamond: 0.5,
-    hexagon: 0.7,
+    rectangle: { w: 0.9, h: 0.9 },
+    square: { w: 0.85, h: 0.85 },
+    circle: { w: 0.75, h: 0.75 },
+    triangle: { w: 0.6, h: 0.35 },
+    diamond: { w: 0.6, h: 0.45 },
+    hexagon: { w: 0.75, h: 0.6 },
   };
 
-  const widthRatio = shapeBoundRatio[panel.shape] || 0.7;
-  const heightRatio = shapeBoundRatio[panel.shape] || 0.7;
-
-  const maxTextWidth = panel.width * widthRatio;
-  const maxLines = Math.floor((panel.height * heightRatio) / ((panel.fontSize || 16) * 1.2));
+  const ratio = shapeBoundRatio[panel.shape] || { w: 0.7, h: 0.7 };
+  const maxTextWidth = panel.width * ratio.w;
+  const maxTextHeight = panel.height * ratio.h;
 
   return (
     <div
-      className="absolute"
+      className="flex items-center justify-center"
       style={{
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)',
-        fontSize,
-        color: textColor,
-        width: `${maxTextWidth}px`,
-        maxHeight: `${panel.height * heightRatio}px`,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        pointerEvents: 'auto',
-        overflow: 'hidden',
+        width: '100%',
+        height: '100%',
         textAlign: 'center',
-        wordBreak: 'break-word',
-        lineHeight: 1.2,
       }}
-      onDoubleClick={() => setEditingId(panel.id)}
     >
-      {isEditing ? (
-        <textarea
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          autoFocus
-          className="bg-transparent text-center outline-none w-full h-full resize-none"
-          style={{ fontSize, color: textColor }}
-        />
-      ) : (
-        <span
-          className="select-text cursor-text w-full"
+      <div
+        style={{
+          maxWidth: maxTextWidth,
+          maxHeight: maxTextHeight,
+          padding: '2px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+        }}
+      >
+        <div
           style={{
-            width: '100%',
-            height: '100%',
-            color: panel.textColor || '#000',
-            fontSize: panel.fontSize || 16,
+            fontSize,
+            color: textColor,
             fontWeight: panel.fontWeight || 'normal',
             fontStyle: panel.fontStyle || 'normal',
             textDecoration: panel.textDecoration || 'none',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'normal',
-            wordBreak: 'break-word',
-            overflowWrap: 'break-word',
             textAlign: 'center',
-            userSelect: 'text',
+            overflowWrap: 'break-word',
+            wordBreak: 'break-word',
             lineHeight: 1.2,
-            display: '-webkit-box',
-            WebkitLineClamp: maxLines,
-            WebkitBoxOrient: 'vertical',
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
         >
-          {text.trim() || ''}
-        </span>
-      )}
+          {panel.text?.trim()}
+        </div>
+      </div>
     </div>
   );
 }

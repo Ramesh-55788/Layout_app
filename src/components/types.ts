@@ -35,4 +35,6 @@ export interface PanelPropertiesProps {
     zAction?: 'bringToFront' | 'sendToBack' | 'moveForward' | 'moveBackward'
   ) => void;
   onClose: () => void;
+  isEditing: boolean;
+  setIsEditing: (val: boolean) => void;
 }
