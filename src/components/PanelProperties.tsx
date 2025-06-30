@@ -15,7 +15,7 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
   const [fontWeight, setFontWeight] = useState<'normal' | 'bold'>('normal');
   const [fontStyle, setFontStyle] = useState<'normal' | 'italic'>('normal');
   const [textDecoration, setTextDecoration] = useState<'none' | 'underline'>('none');
-  const [rotation, setRotation] = useState(panel.rotation || 0);
+  const [rotation, setRotation] = useState(panel.rotation);
 
   useEffect(() => {
     if (panel) {
@@ -317,14 +317,21 @@ function PanelProperties({ panel, theme, onUpdateProperties, onClose, isEditing,
                 <div className="flex items-center gap-2">
                   <input
                     type="number"
-                    value={Math.max(0, Math.min(360, rotation))}
+                    value={rotation}
                     onChange={(e) => {
-                      setRotation(parseInt(e.target.value));
+                      let val = parseInt(e.target.value);
+                      if (!isNaN(val)) {
+                        val = Math.max(0, Math.min(360, val));
+                        setRotation(val);
+                        rotationRef.current = val;
+                      }
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        setRotation(rotation);
-                        handleUpdate();
+                        onUpdateProperties(
+                          parseInt(editWidth), parseInt(editHeight), bgColor, borderColor, text, parseInt(borderWidth),
+                          textColor, fontSize, fontWeight, fontStyle, textDecoration, undefined, rotationRef.current
+                        );
                       }
                     }}
                     className="w-full px-2 py-1 border rounded text-sm bg-white text-black flex-1"
